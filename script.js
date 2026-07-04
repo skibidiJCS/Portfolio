@@ -10,6 +10,7 @@ const storyTrack = document.querySelector(".story-track");
 const storySlides = document.querySelectorAll(".story-slide");
 const storyWindows = document.querySelectorAll(".story-window");
 const themeSections = document.querySelectorAll("main > section");
+let activeThemeSection = themeSections[0] || null;
 const hero = document.querySelector(".hero");
 const heroStage = document.querySelector(".hero-stage");
 const monogramLetters = {
@@ -30,6 +31,7 @@ const timelineStage = document.querySelector(".timeline-stage");
 const timelineViewport = document.querySelector(".timeline-viewport");
 const timelineRail = document.querySelector(".timeline-rail");
 const timelineYears = Array.from(document.querySelectorAll(".timeline-year"));
+const timelineStatusYear = document.querySelector(".timeline-status-year");
 let timelineHorizontalTravel = 0;
 let timelineStageHeight = 0;
 let timelineLastProgress = -1;
@@ -135,6 +137,7 @@ const detailLabel = detailView?.querySelector(".detail-label");
 const detailTitle = detailView?.querySelector(".detail-copy h2");
 const detailCopy = detailView?.querySelector(".detail-copy p");
 const highlightBlocks = document.querySelectorAll(".text-highlight");
+const educationSequence = document.querySelector("[data-education-sequence]");
 let currentStorySlide = null;
 let highlightResizeTimer = null;
 const jcsScrollStart = 0.018;
@@ -177,7 +180,11 @@ const updateTimelineMetrics = () => {
 
   if (timelineMotionFrame) cancelAnimationFrame(timelineMotionFrame);
   timelineMotionFrame = 0;
-  timelineHorizontalTravel = Math.max(0, timelineRail.scrollWidth - timelineViewport.clientWidth);
+  const firstYear = timelineYears[0];
+  const lastYear = timelineYears[timelineYears.length - 1];
+  const firstCenter = firstYear ? firstYear.offsetLeft + firstYear.offsetWidth / 2 : 0;
+  const lastCenter = lastYear ? lastYear.offsetLeft + lastYear.offsetWidth / 2 : firstCenter;
+  timelineHorizontalTravel = Math.max(0, lastCenter - firstCenter);
   timelineStageHeight = timelineStage.clientHeight || window.innerHeight;
   timelineSection.style.height = `${Math.ceil(timelineStageHeight + timelineHorizontalTravel)}px`;
   timelineSection.style.setProperty("--timeline-horizontal-travel", `${timelineHorizontalTravel.toFixed(2)}px`);
@@ -193,13 +200,14 @@ const renderTimelineProgress = (progress) => {
     timelineLastProgress = progress;
   }
 
-  if (!timelineVisible) {
-    if (timelineLastIndex !== -1) {
-      timelineYears.forEach((year) => year.classList.remove("is-current"));
-      timelineLastIndex = -1;
-    }
-    return;
-  }
+  const timelinePosition = progress * Math.max(0, timelineYears.length - 1);
+  timelineYears.forEach((year, index) => {
+    const signedDistance = index - timelinePosition;
+    const distance = Math.min(1.5, Math.abs(signedDistance));
+    year.style.setProperty("--timeline-depth", distance.toFixed(3));
+    year.style.setProperty("--timeline-direction", signedDistance < 0 ? "-1" : "1");
+    year.style.setProperty("--timeline-scene-opacity", Math.max(0.18, 1 - distance * 0.56).toFixed(3));
+  });
 
   const panelStep = timelineYears.length > 1 ? timelineHorizontalTravel / (timelineYears.length - 1) : 0;
   const currentIndex = panelStep > 0
@@ -207,6 +215,9 @@ const renderTimelineProgress = (progress) => {
     : 0;
   if (currentIndex === timelineLastIndex) return;
   timelineYears.forEach((year, index) => year.classList.toggle("is-current", index === currentIndex));
+  if (timelineStatusYear) {
+    timelineStatusYear.textContent = timelineYears[currentIndex]?.dataset.year || "";
+  }
   timelineLastIndex = currentIndex;
 };
 
@@ -303,6 +314,8 @@ const revealObserver = new IntersectionObserver(
 );
 
 revealItems.forEach((item) => revealObserver.observe(item));
+
+educationSequence?.classList.add("education-sequence-ready");
 
 const chapterObserver = new IntersectionObserver(
   (entries) => {
@@ -434,6 +447,19 @@ const activateHighlightBlock = (block) => {
   const profile = block.closest(".profile");
   const projects = block.closest(".projects");
   const closing = block.closest(".closing-inner");
+  const education = block.closest(".education");
+
+  if (education) {
+    const stageDelay = 360;
+    education.style.setProperty("--education-stage-delay", `${stageDelay}ms`);
+    education.style.setProperty("--education-mark-delay", `${stageDelay + 340}ms`);
+    education.style.setProperty("--education-date-delay", `${stageDelay + 430}ms`);
+    education.style.setProperty("--education-title-delay", `${stageDelay + 530}ms`);
+    education.style.setProperty("--education-copy-delay", `${stageDelay + 630}ms`);
+    block.classList.add("is-highlighted");
+    education.classList.add("is-education-active");
+    return;
+  }
 
   if (profile) {
     profile.classList.add("highlight-sequence");
@@ -666,15 +692,10 @@ const updateChapterProgress = () => {
 const updateTheme = () => {
   if (!themeSections.length) return;
 
-  const viewportCenter = window.innerHeight / 2;
-  let activeSection = themeSections[0];
-
-  themeSections.forEach((section) => {
-    const rect = section.getBoundingClientRect();
-    if (rect.top <= viewportCenter && rect.bottom >= viewportCenter) {
-      activeSection = section;
-    }
-  });
+  const centeredElement = document.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2);
+  const centeredSection = centeredElement?.closest("main > section");
+  if (centeredSection) activeThemeSection = centeredSection;
+  const activeSection = activeThemeSection || themeSections[0];
 
   const theme = sectionTheme(activeSection);
   const isDark = theme === "dark";

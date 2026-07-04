@@ -16,7 +16,7 @@
     <meta name="twitter:description" content="Portfolio" />
     <link rel="stylesheet" href="style.css" />
   </head>
-  <body class="intro-lock">
+  <body>
     <div class="noise" aria-hidden="true"></div>
     <div class="scroll-meter" aria-hidden="true"><span></span></div>
     <div class="hero-monogram" aria-hidden="true">
@@ -346,19 +346,26 @@
         <i class="chapter-baton"></i>
       </section>
 
-      <section class="education section-grid">
-        <div class="section-heading reveal">
+      <section class="education section-grid" data-education-sequence>
+        <div class="section-heading education-heading">
           <p class="eyebrow">Education</p>
-          <h2>Collège Sainte-Anne de Lachine.</h2>
+          <h2
+            class="education-school-highlight text-highlight"
+            data-lines="Collège Sainte-Anne de Lachine."
+            data-highlight-base="80"
+            data-highlight-step="55"
+          >Collège Sainte-Anne de Lachine.</h2>
         </div>
-        <div class="education-panel reveal" aria-label="High School Diploma">
-          <div class="education-date">Expected 2027</div>
-          <div class="education-mark">DES</div>
-          <h3>High School Diploma</h3>
-          <p>
-            SciMaTic Program: enriched studies focused on science, mathematics,
-            and technology.
-          </p>
+        <div class="education-certificate-stage">
+          <div class="education-panel" aria-label="High School Diploma">
+            <div class="education-date">Expected 2027</div>
+            <div class="education-mark">DES</div>
+            <h3>High School Diploma</h3>
+            <p>
+              SciMaTic Program: enriched studies focused on science, mathematics,
+              and technology.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -415,13 +422,16 @@
         <div class="timeline-stage">
           <header class="timeline-intro reveal">
             <h2>Timeline</h2>
+            <div class="timeline-status" aria-hidden="true">
+              <strong class="timeline-status-year">2023</strong>
+            </div>
           </header>
 
           <div class="timeline-viewport">
             <div class="timeline-rail">
               <div class="timeline-line" aria-hidden="true"><span></span></div>
 
-              <article class="timeline-year" data-year="2023">
+              <article class="timeline-year is-current" data-year="2023">
                 <div class="timeline-year-label">2023</div>
                 <div class="timeline-events">
                   <div class="timeline-event">
@@ -507,6 +517,11 @@
                     <h3>Expo-sciences presentation</h3>
                     <p>Completed and presented the 2025-2026 SciMaTic technical project.</p>
                   </div>
+                  <div class="timeline-event">
+                    <span>Volunteering</span>
+                    <h3>MUHC Hospital volunteering</h3>
+                    <p>Contributed time in a healthcare environment where attention and reliability matter.</p>
+                  </div>
                 </div>
               </article>
 
@@ -532,7 +547,7 @@
             <path class="signature-j-body" d="M270 38 C264 120 252 220 211 294 C173 362 102 395 44 362 C22 349 7 325 8 295" />
             <path class="signature-c" d="M500 85 C470 52 416 60 376 107 C334 155 333 229 370 266 C405 301 464 282 498 243" />
             <path class="signature-s" d="M662 86 C634 57 583 61 553 97 C522 134 547 165 592 185 C640 207 670 233 646 272 C618 316 559 309 527 276" />
-            <path class="signature-flourish" d="M116 425 C300 401 504 402 686 418" />
+            <path class="signature-flourish" d="M116 430 C300 416 504 400 686 386" />
           </svg>
         </div>
 
