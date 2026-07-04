@@ -1401,13 +1401,9 @@ body.theme-dark .education-mark {
 
 .timeline-intro {
   position: absolute;
-  top: clamp(34px, 5vh, 64px);
+  top: clamp(92px, 11vh, 128px);
   left: clamp(24px, 5vw, 76px);
-  right: clamp(24px, 5vw, 76px);
   z-index: 4;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
   pointer-events: none;
 }
 
@@ -1415,18 +1411,6 @@ body.theme-dark .education-mark {
   margin: 0;
   font-size: clamp(3rem, 5.8vw, 6.8rem);
   line-height: 0.82;
-}
-
-.timeline-status {
-  display: grid;
-  justify-items: end;
-  padding-top: 4px;
-  text-align: right;
-}
-
-.timeline-status strong {
-  font-size: clamp(1.6rem, 2.8vw, 3.2rem);
-  line-height: 0.9;
 }
 
 .timeline-viewport {
@@ -2159,6 +2143,7 @@ body.theme-dark .education-mark {
 .signature-section {
   position: relative;
   min-height: 100svh;
+  margin-top: clamp(-180px, -14svh, -110px);
   padding: 0;
   background: var(--page-final);
 }
@@ -2651,17 +2636,12 @@ body.theme-dark .education-mark {
   }
 
   .timeline-intro {
-    top: 30px;
+    top: 76px;
     left: 18px;
-    right: 18px;
   }
 
   .timeline-intro h2 {
     font-size: clamp(2.8rem, 14vw, 4.4rem);
-  }
-
-  .timeline-status strong {
-    font-size: clamp(1.35rem, 7vw, 2rem);
   }
 
   .timeline-viewport {
@@ -2845,7 +2825,7 @@ body.theme-dark .education-mark {
 
   .signature-section {
     min-height: 100svh;
-    margin-top: clamp(-220px, -24svh, -130px);
+    margin-top: clamp(-260px, -29svh, -170px);
     padding: 0;
   }
 
@@ -3339,7 +3319,7 @@ body.theme-dark .education-mark {
 
 @media (max-width: 860px) and (max-height: 640px) {
   .timeline-intro {
-    top: 18px;
+    top: 58px;
   }
 
   .timeline-intro h2 {

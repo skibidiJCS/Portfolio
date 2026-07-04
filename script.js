@@ -31,7 +31,6 @@ const timelineStage = document.querySelector(".timeline-stage");
 const timelineViewport = document.querySelector(".timeline-viewport");
 const timelineRail = document.querySelector(".timeline-rail");
 const timelineYears = Array.from(document.querySelectorAll(".timeline-year"));
-const timelineStatusYear = document.querySelector(".timeline-status-year");
 let timelineHorizontalTravel = 0;
 let timelineStageHeight = 0;
 let timelineLastProgress = -1;
@@ -215,9 +214,6 @@ const renderTimelineProgress = (progress) => {
     : 0;
   if (currentIndex === timelineLastIndex) return;
   timelineYears.forEach((year, index) => year.classList.toggle("is-current", index === currentIndex));
-  if (timelineStatusYear) {
-    timelineStatusYear.textContent = timelineYears[currentIndex]?.dataset.year || "";
-  }
   timelineLastIndex = currentIndex;
 };
 
