@@ -35,14 +35,10 @@ let timelineHorizontalTravel = 0;
 let timelineStageHeight = 0;
 let timelineLastProgress = -1;
 let timelineLastIndex = -1;
-let timelineTargetProgress = 0;
-let timelineRenderedProgress = 0;
-let timelineMotionFrame = 0;
 let timelineVisible = false;
 let storyMetrics = null;
 let viewportWidth = 0;
 let heroTransitionComplete = false;
-const mobileTimelineQuery = window.matchMedia("(max-width: 860px)");
 const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 const hasNativeChapterTimeline = Boolean(
   window.CSS?.supports?.("animation-timeline: view()") &&
@@ -51,24 +47,19 @@ const hasNativeChapterTimeline = Boolean(
 const chapterTravel = new WeakMap();
 const signatureSection = document.querySelector(".signature-section");
 const signatureGraphic = document.querySelector(".jcs-signature");
+const signaturePaper = document.querySelector(".signature-paper");
 const signaturePhoto = document.querySelector(".signature-photo");
 const signaturePaths = Array.from(document.querySelectorAll(".jcs-signature path"));
 const signatureLengths = signaturePaths.map((path) => {
   const hiddenLength = Math.ceil(path.getTotalLength()) + 4;
   path.style.strokeDasharray = `${hiddenLength.toFixed(2)}`;
   path.style.strokeDashoffset = hiddenLength.toFixed(2);
-  path.style.opacity = "0";
-  path.style.visibility = "hidden";
+  path.style.opacity = "1";
+  path.style.visibility = "visible";
   return hiddenLength;
 });
-
-const signaturePenLift = 8;
-const signatureDurations = signatureLengths.map((length, index) => {
-  const speed = index === signatureLengths.length - 1 ? 2.15 : 1.9;
-  return Math.min(320, Math.max(120, length / speed));
-});
-
-const wait = (duration) => new Promise((resolve) => window.setTimeout(resolve, duration));
+const signatureStrokeWeights = [0.08, 0.025, 0.235, 0.2, 0.2, 0.025, 0.235];
+let signatureLastProgress = -1;
 
 const penStrokeProgress = (time) => {
   const progress = Math.min(1, Math.max(0, time));
@@ -80,63 +71,35 @@ const penStrokeProgress = (time) => {
   return 1 - (remaining * remaining) / (2 * ramp * distance);
 };
 
-const drawSignatureStroke = (path, hiddenLength, duration) => new Promise((resolve) => {
-  const startedAt = performance.now();
-  path.style.visibility = "visible";
-  path.style.opacity = "1";
+const updateSignatureProgress = () => {
+  if (!signatureSection || !signatureGraphic || !signaturePaper || !signaturePhoto || !signaturePaths.length) return;
 
-  const drawFrame = (time) => {
-    const elapsed = Math.min(1, (time - startedAt) / duration);
-    const progress = penStrokeProgress(elapsed);
-    path.style.strokeDashoffset = (hiddenLength * (1 - progress)).toFixed(2);
-    if (elapsed < 1) {
-      requestAnimationFrame(drawFrame);
-      return;
-    }
-    path.style.strokeDashoffset = "0";
-    resolve();
-  };
+  const viewportHeight = Math.max(1, window.innerHeight);
+  const sectionRect = signatureSection.getBoundingClientRect();
+  const photoTop = sectionRect.top + signaturePaper.offsetTop;
+  const photoBottom = photoTop + signaturePaper.offsetHeight;
+  const photoProgress = Math.min(1, Math.max(0, (viewportHeight * 0.97 - photoTop) / (viewportHeight * 0.24)));
+  const signatureTravel = Math.max(1, viewportHeight * 0.22);
+  const rawSignatureProgress = Math.min(1, Math.max(0, (viewportHeight - 24 - photoBottom) / signatureTravel));
+  const signatureProgress = reducedMotionQuery.matches
+    ? (rawSignatureProgress > 0 ? 1 : 0)
+    : rawSignatureProgress;
 
-  requestAnimationFrame(drawFrame);
-});
+  signaturePaper.style.opacity = photoProgress.toFixed(3);
+  signaturePaper.style.transform = `translate3d(0, ${((1 - photoProgress) * 26).toFixed(2)}px, 0) rotate(${(-1 - photoProgress * 2.2).toFixed(2)}deg) scale(${(0.95 + photoProgress * 0.05).toFixed(4)})`;
 
-const playSignature = async () => {
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (Math.abs(signatureProgress - signatureLastProgress) < 0.001) return;
+  signatureLastProgress = signatureProgress;
 
-  for (let index = 0; index < signaturePaths.length; index += 1) {
-    const path = signaturePaths[index];
-    const hiddenLength = signatureLengths[index];
-
-    if (reducedMotion) {
-      path.style.visibility = "visible";
-      path.style.opacity = "1";
-      path.style.strokeDashoffset = "0";
-      continue;
-    }
-
-    await drawSignatureStroke(path, hiddenLength, signatureDurations[index]);
-    await wait(signaturePenLift);
-  }
+  let strokeStart = 0;
+  signaturePaths.forEach((path, index) => {
+    const weight = signatureStrokeWeights[index] || (1 / signaturePaths.length);
+    const localProgress = Math.min(1, Math.max(0, (signatureProgress - strokeStart) / weight));
+    const easedProgress = penStrokeProgress(localProgress);
+    path.style.strokeDashoffset = (signatureLengths[index] * (1 - easedProgress)).toFixed(2);
+    strokeStart += weight;
+  });
 };
-
-if (signatureSection && signatureGraphic && signaturePhoto && signaturePaths.length) {
-  const signatureObserver = new IntersectionObserver(
-    async (entries, observer) => {
-      const entry = entries[0];
-      if (!entry?.isIntersecting) return;
-      observer.disconnect();
-      signatureSection.classList.add("signature-photo-active");
-      if (!reducedMotionQuery.matches) await wait(560);
-      signatureSection.classList.add("signature-active");
-      requestAnimationFrame(() => playSignature());
-    },
-    {
-      threshold: 0.46,
-      rootMargin: "0px",
-    }
-  );
-  signatureObserver.observe(signatureSection);
-}
 const reactiveItems = document.querySelectorAll(".skill-group, .education-panel");
 const projectStack = document.querySelector(".project-stack");
 const layerCards = Array.from(document.querySelectorAll(".layer-card"));
@@ -189,8 +152,6 @@ const updateChapterTravel = () => {
 const updateTimelineMetrics = () => {
   if (!timelineSection || !timelineStage || !timelineViewport || !timelineRail) return;
 
-  if (timelineMotionFrame) cancelAnimationFrame(timelineMotionFrame);
-  timelineMotionFrame = 0;
   const firstYear = timelineYears[0];
   const lastYear = timelineYears[timelineYears.length - 1];
   const firstCenter = firstYear ? firstYear.offsetLeft + firstYear.offsetWidth / 2 : 0;
@@ -201,7 +162,6 @@ const updateTimelineMetrics = () => {
   timelineSection.style.setProperty("--timeline-horizontal-travel", `${timelineHorizontalTravel.toFixed(2)}px`);
   timelineLastProgress = -1;
   timelineLastIndex = -1;
-  timelineTargetProgress = timelineRenderedProgress;
 };
 
 const renderTimelineProgress = (progress) => {
@@ -229,21 +189,6 @@ const renderTimelineProgress = (progress) => {
   timelineLastIndex = currentIndex;
 };
 
-const animateTimelineProgress = () => {
-  timelineMotionFrame = 0;
-  const delta = timelineTargetProgress - timelineRenderedProgress;
-  if (Math.abs(delta) < 0.00025) {
-    timelineRenderedProgress = timelineTargetProgress;
-    renderTimelineProgress(timelineRenderedProgress);
-    return;
-  }
-
-  const followStrength = 0.22 + Math.min(0.16, Math.abs(delta) * 0.45);
-  timelineRenderedProgress += delta * followStrength;
-  renderTimelineProgress(timelineRenderedProgress);
-  timelineMotionFrame = requestAnimationFrame(animateTimelineProgress);
-};
-
 const updateTimelineProgress = () => {
   if (!timelineSection || !timelineStage || !timelineViewport || !timelineRail || !timelineYears.length) return;
 
@@ -252,17 +197,7 @@ const updateTimelineProgress = () => {
   const verticalTravel = Math.max(1, rect.height - stageHeight);
   const progress = Math.min(1, Math.max(0, -rect.top / verticalTravel));
   timelineVisible = rect.bottom > 0 && rect.top < stageHeight;
-  timelineTargetProgress = progress;
-
-  if (!mobileTimelineQuery.matches || reducedMotionQuery.matches) {
-    if (timelineMotionFrame) cancelAnimationFrame(timelineMotionFrame);
-    timelineMotionFrame = 0;
-    timelineRenderedProgress = progress;
-    renderTimelineProgress(progress);
-    return;
-  }
-
-  if (!timelineMotionFrame) timelineMotionFrame = requestAnimationFrame(animateTimelineProgress);
+  renderTimelineProgress(progress);
 };
 
 const updateStoryMetrics = () => {
@@ -308,6 +243,7 @@ const updateScroll = () => {
   updateHeroTransition();
   updateChapterProgress();
   updateTimelineProgress();
+  updateSignatureProgress();
   updateStoryTrack();
   updateTheme();
   updateHighlights();
