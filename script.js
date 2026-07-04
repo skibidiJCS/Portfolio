@@ -51,79 +51,91 @@ const hasNativeChapterTimeline = Boolean(
 const chapterTravel = new WeakMap();
 const signatureSection = document.querySelector(".signature-section");
 const signatureGraphic = document.querySelector(".jcs-signature");
+const signaturePhoto = document.querySelector(".signature-photo");
 const signaturePaths = Array.from(document.querySelectorAll(".jcs-signature path"));
-const signatureStrokePadding = 28;
 const signatureLengths = signaturePaths.map((path) => {
-  const length = path.getTotalLength();
-  const hiddenLength = length + signatureStrokePadding;
-  path.style.strokeDasharray = `${hiddenLength.toFixed(2)} ${hiddenLength.toFixed(2)}`;
+  const hiddenLength = Math.ceil(path.getTotalLength()) + 4;
+  path.style.strokeDasharray = `${hiddenLength.toFixed(2)}`;
   path.style.strokeDashoffset = hiddenLength.toFixed(2);
   path.style.opacity = "0";
   path.style.visibility = "hidden";
-  return length;
+  return hiddenLength;
 });
 
-const signatureTotalLength = signatureLengths.reduce((total, length) => total + length, 0) || 1;
-const signatureDrawTime = 1540;
-const signaturePenLift = 24;
-const signatureDurations = signatureLengths.map((length) =>
-  Math.max(220, (length / signatureTotalLength) * signatureDrawTime)
-);
+const signaturePenLift = 8;
+const signatureDurations = signatureLengths.map((length, index) => {
+  const speed = index === signatureLengths.length - 1 ? 2.15 : 1.9;
+  return Math.min(320, Math.max(120, length / speed));
+});
 
 const wait = (duration) => new Promise((resolve) => window.setTimeout(resolve, duration));
+
+const penStrokeProgress = (time) => {
+  const progress = Math.min(1, Math.max(0, time));
+  const ramp = 0.16;
+  const distance = 1 - ramp;
+  if (progress < ramp) return (progress * progress) / (2 * ramp * distance);
+  if (progress <= 1 - ramp) return (progress - ramp / 2) / distance;
+  const remaining = 1 - progress;
+  return 1 - (remaining * remaining) / (2 * ramp * distance);
+};
+
+const drawSignatureStroke = (path, hiddenLength, duration) => new Promise((resolve) => {
+  const startedAt = performance.now();
+  path.style.visibility = "visible";
+  path.style.opacity = "1";
+
+  const drawFrame = (time) => {
+    const elapsed = Math.min(1, (time - startedAt) / duration);
+    const progress = penStrokeProgress(elapsed);
+    path.style.strokeDashoffset = (hiddenLength * (1 - progress)).toFixed(2);
+    if (elapsed < 1) {
+      requestAnimationFrame(drawFrame);
+      return;
+    }
+    path.style.strokeDashoffset = "0";
+    resolve();
+  };
+
+  requestAnimationFrame(drawFrame);
+});
 
 const playSignature = async () => {
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   for (let index = 0; index < signaturePaths.length; index += 1) {
     const path = signaturePaths[index];
-    const length = signatureLengths[index];
-    const hiddenLength = length + signatureStrokePadding;
-    path.style.visibility = "visible";
-    path.style.opacity = "1";
+    const hiddenLength = signatureLengths[index];
 
     if (reducedMotion) {
+      path.style.visibility = "visible";
+      path.style.opacity = "1";
       path.style.strokeDashoffset = "0";
       continue;
     }
 
-    const animation = path.animate(
-      [
-        { strokeDashoffset: hiddenLength.toFixed(2) },
-        { strokeDashoffset: "0" },
-      ],
-      {
-        duration: signatureDurations[index],
-        easing: "cubic-bezier(0.37, 0, 0.63, 1)",
-        fill: "forwards",
-      }
-    );
-
-    try {
-      await animation.finished;
-    } catch {
-      // Keep the final stroke state if the browser interrupts an animation.
-    }
-    path.style.strokeDashoffset = "0";
+    await drawSignatureStroke(path, hiddenLength, signatureDurations[index]);
     await wait(signaturePenLift);
   }
 };
 
-if (signatureSection && signatureGraphic && signaturePaths.length) {
+if (signatureSection && signatureGraphic && signaturePhoto && signaturePaths.length) {
   const signatureObserver = new IntersectionObserver(
-    (entries, observer) => {
+    async (entries, observer) => {
       const entry = entries[0];
       if (!entry?.isIntersecting) return;
-      signatureSection.classList.add("signature-active");
       observer.disconnect();
-      requestAnimationFrame(playSignature);
+      signatureSection.classList.add("signature-photo-active");
+      if (!reducedMotionQuery.matches) await wait(560);
+      signatureSection.classList.add("signature-active");
+      requestAnimationFrame(() => playSignature());
     },
     {
-      threshold: 0.55,
+      threshold: 0.46,
       rootMargin: "0px",
     }
   );
-  signatureObserver.observe(signatureGraphic);
+  signatureObserver.observe(signatureSection);
 }
 const reactiveItems = document.querySelectorAll(".skill-group, .education-panel");
 const projectStack = document.querySelector(".project-stack");
@@ -288,9 +300,10 @@ const updateScroll = () => {
   meter.style.transform = `scaleX(${Math.min(1, Math.max(0, progress / 100))})`;
 
   document.documentElement.style.setProperty("--scroll", progress.toFixed(2));
-  if (signatureSection) {
-    const signatureRect = signatureSection.getBoundingClientRect();
-    document.body.classList.toggle("signature-zone", signatureRect.top < window.innerHeight * 0.94);
+  if (timelineSection) {
+    const timelineRect = timelineSection.getBoundingClientRect();
+    const exitY = Math.min(0, timelineRect.bottom - window.innerHeight);
+    document.documentElement.style.setProperty("--jcs-exit-y", `${exitY.toFixed(2)}px`);
   }
   updateHeroTransition();
   updateChapterProgress();
