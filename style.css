@@ -26,6 +26,8 @@
   --bgy: 50vh;
   --viewport-width: 100vw;
   --hero-progress: 0;
+  --hero-card-scale: 1;
+  --hero-marquee-opacity: 0;
   --jcs-opacity: 0;
   --z-backdrop: 0;
   --z-noise: 1;
@@ -198,12 +200,98 @@ img {
 }
 
 .hero {
-  min-height: 125svh;
+  min-height: 190svh;
   padding: 0;
-  overflow: visible;
+  overflow: clip;
   display: block;
+  background: var(--page-dark);
   --hero-ease: calc(var(--hero-progress) * var(--hero-progress) * (3 - 2 * var(--hero-progress)));
-  --hero-zoom: calc(var(--hero-ease) * var(--hero-ease));
+}
+
+.hero-sticky-shell {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  background: var(--page-dark);
+  isolation: isolate;
+}
+
+.hero-profile-anchor {
+  position: absolute;
+  top: 82svh;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.hero-marquee-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0;
+  overflow: hidden;
+  opacity: var(--hero-marquee-opacity);
+  pointer-events: none;
+  transition: opacity 80ms linear;
+}
+
+.hero-marquee {
+  position: relative;
+  width: 100%;
+  padding-block: clamp(7px, 1vw, 14px);
+  overflow: hidden;
+  white-space: nowrap;
+  contain: paint;
+  isolation: isolate;
+}
+
+.hero-marquee-primary {
+  color: var(--lime);
+}
+
+.hero-marquee-secondary {
+  margin-top: -38px;
+  color: #f3f3eb;
+}
+
+.hero-marquee-track {
+  display: flex;
+  width: max-content;
+  align-items: center;
+}
+
+.hero-marquee-group {
+  display: flex;
+  flex: none;
+  align-items: center;
+}
+
+.hero-marquee span {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  padding-right: 0.26em;
+  color: inherit;
+  font-size: clamp(6rem, 11vw, 12.5rem);
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  font-weight: 400;
+  line-height: 0.88;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+}
+
+.hero-marquee-secondary span {
+  font-size: clamp(6rem, 11vw, 12.5rem);
+  font-family: "Arial Black", Arial, sans-serif;
+  font-style: normal;
+  font-weight: 900;
+  line-height: 0.88;
+  letter-spacing: -0.045em;
 }
 
 .hero-stage {
@@ -211,8 +299,9 @@ img {
   --hero-square-width: min(50vw, 720px, 70vh);
   --hero-side-margin: max(24px, calc((100vw - var(--max)) / 2));
   --hero-content-gap: clamp(36px, 5vw, 72px);
-  position: sticky;
-  top: 0;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
   min-height: 100svh;
   display: flex;
   flex-direction: column;
@@ -220,6 +309,12 @@ img {
   gap: 32px;
   padding: 72px 24px;
   overflow: hidden;
+  border-radius: 0;
+  background: var(--page-a);
+  box-shadow: 0 34px 100px rgba(0, 0, 0, calc(var(--hero-marquee-opacity) * 0.42));
+  transform: scale(var(--hero-card-scale));
+  transform-origin: center center;
+  will-change: transform, border-radius, box-shadow;
 }
 
 .hero-stage::before {
@@ -240,8 +335,8 @@ img {
 }
 
 .hero.scrolling .hero-stage::before {
-  opacity: calc(var(--hero-photo-opacity, 1) * 0.56) !important;
-  transform: translateY(calc(-50% - var(--hero-ease) * 5vh)) scale(calc(1 + var(--hero-ease) * 1.08)) rotate(calc(-10deg + var(--hero-ease) * 7deg));
+  opacity: 0.56 !important;
+  transform: translateY(-50%) scale(1) rotate(-10deg);
 }
 
 .hero-photo {
@@ -261,9 +356,9 @@ img {
 }
 
 .hero.scrolling .hero-photo {
-  opacity: var(--hero-photo-opacity, 1) !important;
-  border-radius: calc(32px - var(--hero-ease) * 14px);
-  transform: translateY(calc(-50% - var(--hero-ease) * 3vh)) scale(calc(1 + var(--hero-ease) * 0.78)) rotate(calc(-2deg + var(--hero-ease) * 2deg));
+  opacity: 1 !important;
+  border-radius: 32px;
+  transform: translateY(-50%) scale(1) rotate(-2deg);
 }
 
 .hero-photo img {
@@ -399,6 +494,17 @@ body.intro-lock .hero-monogram {
   color: rgba(var(--ink-rgb), var(--jcs-s-fill, 1));
   -webkit-text-fill-color: rgba(var(--ink-rgb), var(--jcs-s-fill, 1));
   -webkit-text-stroke: var(--jcs-s-stroke, 0px) rgb(var(--ink-rgb));
+}
+
+body.hero-zoomed .hero-monogram span {
+  color: #f3f3eb;
+  text-shadow: 0 1px 14px rgba(17, 17, 17, 0.86);
+}
+
+body.hero-zoomed .hero-monogram span[data-jcs-letter="s"] {
+  color: rgba(243, 243, 235, var(--jcs-s-fill, 1));
+  -webkit-text-fill-color: rgba(243, 243, 235, var(--jcs-s-fill, 1));
+  -webkit-text-stroke: var(--jcs-s-stroke, 0px) #f3f3eb;
 }
 
 .hero .eyebrow,
@@ -2017,6 +2123,10 @@ body.theme-dark .education-mark {
   view-timeline-axis: block;
 }
 
+.chapter-chess {
+  min-height: 72svh;
+}
+
 .chapter-education,
 .chapter-focus {
   --chapter-bg: var(--page-final);
@@ -2560,7 +2670,7 @@ body.theme-dark .education-mark {
   }
 
   .hero {
-    min-height: 150svh;
+    min-height: 190svh;
   }
 
   .hero-stage {
@@ -2618,12 +2728,30 @@ body.theme-dark .education-mark {
   }
 
   .hero.scrolling .hero-photo {
-    border-radius: calc(24px - var(--hero-ease) * 8px);
-    transform: translateY(calc(var(--hero-ease) * -2vh)) scale(calc(1 + var(--hero-ease) * 0.34)) rotate(calc(-2deg + var(--hero-ease) * 2deg));
+    border-radius: 24px;
+    transform: scale(1) rotate(-2deg);
   }
 
   .hero.scrolling .hero-stage::before {
-    transform: translateY(calc(var(--hero-ease) * -2vh)) scale(calc(1 + var(--hero-ease) * 0.42)) rotate(calc(-10deg + var(--hero-ease) * 7deg));
+    transform: translateY(-50%) scale(1) rotate(-10deg);
+  }
+
+  .hero-marquee span {
+    font-size: clamp(3.8rem, 16vw, 6rem);
+  }
+
+  .hero-marquee-secondary span {
+    font-size: clamp(3.8rem, 16vw, 6rem);
+  }
+
+  .hero-marquee-secondary {
+    margin-top: -20px;
+  }
+
+  .hero-marquee-stage {
+    justify-content: flex-start;
+    gap: 0;
+    padding-top: 73svh;
   }
 
   .hero-content {
@@ -2883,6 +3011,10 @@ body.theme-dark .education-mark {
 
   .chapter {
     min-height: 100svh;
+  }
+
+  .chapter-chess {
+    min-height: 72svh;
   }
 
   .chapter > span > b {
@@ -3390,11 +3522,11 @@ body.theme-dark .education-mark {
   }
 
   .hero.scrolling .hero-photo {
-    transform: translateY(calc(var(--hero-ease) * -2vh)) scale(calc(1 + var(--hero-ease) * 0.28)) rotate(calc(-2deg + var(--hero-ease) * 2deg));
+    transform: scale(1) rotate(-2deg);
   }
 
   .hero.scrolling .hero-stage::before {
-    transform: translateY(calc(-50% - var(--hero-ease) * 2vh)) scale(calc(1 + var(--hero-ease) * 0.34)) rotate(calc(-10deg + var(--hero-ease) * 7deg));
+    transform: translateY(-50%) scale(1) rotate(-10deg);
   }
 }
 

@@ -40,6 +40,35 @@ let storyMetrics = null;
 let viewportWidth = 0;
 let heroTransitionComplete = false;
 const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+const heroMarqueeStates = Array.from(document.querySelectorAll(".hero-marquee")).map((row) => ({
+  row,
+  group: row.querySelector(".hero-marquee-group"),
+  width: 0,
+  duration: row.classList.contains("hero-marquee-secondary") ? 14000 : 12000,
+  reverse: row.classList.contains("hero-marquee-secondary"),
+}));
+let heroMarqueesVisible = true;
+
+const updateHeroMarqueeWidths = () => {
+  heroMarqueeStates.forEach((state) => {
+    state.width = state.group?.offsetWidth || 0;
+  });
+};
+
+const animateHeroMarquees = (time) => {
+  if (!reducedMotionQuery.matches && heroMarqueeStates.length && heroMarqueesVisible) {
+    heroMarqueeStates.forEach((state) => {
+      if (!state.width) return;
+      const progress = (time % state.duration) / state.duration;
+      state.row.scrollLeft = state.width * (state.reverse ? 1 - progress : progress);
+    });
+  }
+
+  requestAnimationFrame(animateHeroMarquees);
+};
+
+updateHeroMarqueeWidths();
+requestAnimationFrame(animateHeroMarquees);
 const hasNativeChapterTimeline = Boolean(
   window.CSS?.supports?.("animation-timeline: view()") &&
   window.CSS?.supports?.("view-timeline-name: --chapter-motion")
@@ -216,6 +245,9 @@ const updateStoryMetrics = () => {
 
 window.setTimeout(() => {
   document.body.classList.remove("intro-lock");
+  if (window.location.hash === "#profile") {
+    window.scrollTo(0, document.querySelector("#profile")?.offsetTop || 0);
+  }
   updateScroll();
   /* Freeze intro-animation end-state so the forwards fill is no longer
      needed.  When .scrolling is later toggled, the base styles will be
@@ -542,10 +574,11 @@ const getMonogramTargets = (letters, fontSize) => {
 const updateHeroTransition = () => {
   if (!hero) return;
   const rect = hero.getBoundingClientRect();
+  heroMarqueesVisible = rect.bottom > 0 && rect.top < window.innerHeight;
   if (heroTransitionComplete && rect.bottom <= 0) return;
   if (rect.bottom > 0) heroTransitionComplete = false;
   const travel = Math.max(1, hero.offsetHeight - window.innerHeight);
-  const raw = -rect.top / (travel + window.innerHeight * 0.5);
+  const raw = -rect.top / travel;
   const progress = Math.min(1, Math.max(0, raw));
   const jcsActive = progress > jcsScrollStart;
   Object.values(monogramSources).forEach((source) => {
@@ -559,18 +592,24 @@ const updateHeroTransition = () => {
 
   if (!heroStage) return;
   ensureHeroLetterStarts(progress);
-  const letterProgress = smoothstep(jcsScrollStart, 0.88, progress);
+  const letterProgress = smoothstep(jcsScrollStart, 0.6, progress);
   const opacity = jcsActive ? 1 : 0;
-  const sideOpacity = 1 - smoothstep(0.12, 0.5, progress);
-  const titleOpacity = 1 - smoothstep(0.22, 0.62, progress);
-  const photoOpacity = 1 - smoothstep(0.16, 0.7, progress);
   const sFillProgress = jcsActive ? smoothstep(0.08, 0.72, letterProgress) : 0;
   const sStrokeWidth = 2 * (1 - sFillProgress);
-  heroStage.style.setProperty("--hero-side-opacity", sideOpacity.toFixed(3));
-  heroStage.style.setProperty("--hero-title-opacity", titleOpacity.toFixed(3));
-  heroStage.style.setProperty("--hero-photo-opacity", photoOpacity.toFixed(3));
-  heroStage.style.setProperty("--hero-depth", smoothstep(0.03, 0.72, progress).toFixed(4));
+  const zoomProgress = smoothstep(0.08, 0.78, progress);
+  const isMobile = window.innerWidth < 700;
+  const isShortLandscape = window.innerWidth < 860 && window.innerHeight < 560;
+  const finalScale = isMobile ? 0.4 : isShortLandscape ? 0.44 : 0.36;
+  const cardScale = 1 + (finalScale - 1) * zoomProgress;
+  const marqueeOpacity = smoothstep(0.42, 0.72, progress);
+  heroStage.style.setProperty("--hero-side-opacity", "1");
+  heroStage.style.setProperty("--hero-title-opacity", "1");
+  heroStage.style.setProperty("--hero-photo-opacity", "1");
+  heroStage.style.setProperty("--hero-depth", "0");
+  document.documentElement.style.setProperty("--hero-card-scale", cardScale.toFixed(4));
+  document.documentElement.style.setProperty("--hero-marquee-opacity", marqueeOpacity.toFixed(3));
   document.documentElement.style.setProperty("--jcs-opacity", opacity.toString());
+  document.body.classList.toggle("hero-zoomed", progress > 0.43 && rect.bottom > 0);
 
   const letterEntries = [
     ["j", monogramLetters.j, monogramSources.j],
@@ -1192,6 +1231,7 @@ window.addEventListener("resize", () => {
   heroTransitionComplete = false;
   updateViewportWidth();
   updateMobileHeroLayout();
+  updateHeroMarqueeWidths();
   updateChapterTravel();
   updateTimelineMetrics();
   updateStoryMetrics();
@@ -1216,6 +1256,7 @@ updateTimelineMetrics();
 updateStoryMetrics();
 document.fonts?.ready.then(() => {
   updateMobileHeroLayout();
+  updateHeroMarqueeWidths();
   updateChapterTravel();
   updateTimelineMetrics();
   updateStoryMetrics();
