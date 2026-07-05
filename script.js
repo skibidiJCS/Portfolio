@@ -9,10 +9,12 @@ const scrollStory = document.querySelector(".scroll-story");
 const storyTrack = document.querySelector(".story-track");
 const storySlides = document.querySelectorAll(".story-slide");
 const storyWindows = document.querySelectorAll(".story-window");
-const themeSections = document.querySelectorAll("main > section");
+const themeSections = document.querySelectorAll("main > section, .curtain-sequence > section");
 let activeThemeSection = themeSections[0] || null;
 const hero = document.querySelector(".hero");
 const heroStage = document.querySelector(".hero-stage");
+const projectsSection = document.querySelector("#projects");
+const contactSection = document.querySelector("#contact");
 const monogramLetters = {
   j: document.querySelector('[data-jcs-letter="j"]'),
   c: document.querySelector('[data-jcs-letter="c"]'),
@@ -105,6 +107,10 @@ const updateSignatureProgress = () => {
 
   const viewportHeight = Math.max(1, window.innerHeight);
   const sectionRect = signatureSection.getBoundingClientRect();
+  const rawBackgroundProgress = (viewportHeight * 0.92 - sectionRect.top) / (viewportHeight * 0.7);
+  const backgroundProgress = Math.min(1, Math.max(0, rawBackgroundProgress));
+  const easedBackgroundProgress = backgroundProgress * backgroundProgress * (3 - 2 * backgroundProgress);
+  signatureSection.style.setProperty("--signature-bg-progress", easedBackgroundProgress.toFixed(4));
   const photoTop = sectionRect.top + signaturePaper.offsetTop;
   const photoBottom = photoTop + signaturePaper.offsetHeight;
   const photoProgress = Math.min(1, Math.max(0, (viewportHeight * 0.97 - photoTop) / (viewportHeight * 0.24)));
@@ -140,7 +146,6 @@ const detailLabel = detailView?.querySelector(".detail-label");
 const detailTitle = detailView?.querySelector(".detail-copy h2");
 const detailCopy = detailView?.querySelector(".detail-copy p");
 const highlightBlocks = document.querySelectorAll(".text-highlight");
-const educationSequence = document.querySelector("[data-education-sequence]");
 let currentStorySlide = null;
 let highlightResizeTimer = null;
 const jcsScrollStart = 0.018;
@@ -158,6 +163,20 @@ const updateMobileHeroLayout = () => {
   heroStage.style.removeProperty("--hero-photo-half-height");
   heroStage.style.removeProperty("--hero-square-size");
   heroStage.style.removeProperty("--hero-square-half");
+};
+
+const updateCurtainMetrics = () => {
+  if (!projectsSection) return;
+  const stickyTop = Math.min(0, window.innerHeight - projectsSection.offsetHeight);
+  projectsSection.style.setProperty("--curtain-sticky-top", `${stickyTop}px`);
+};
+
+const updateCurtainState = () => {
+  if (!projectsSection || !contactSection) return;
+  const projectsRect = projectsSection.getBoundingClientRect();
+  const contactRect = contactSection.getBoundingClientRect();
+  const isActive = projectsRect.bottom > 0 && contactRect.top > 0 && contactRect.top < window.innerHeight;
+  document.body.classList.toggle("curtain-in-progress", isActive);
 };
 
 const updateChapterTravel = () => {
@@ -273,6 +292,7 @@ const updateScroll = () => {
     document.documentElement.style.setProperty("--jcs-exit-y", `${exitY.toFixed(2)}px`);
   }
   updateHeroTransition();
+  updateCurtainState();
   updateChapterProgress();
   updateTimelineProgress();
   updateSignatureProgress();
@@ -291,8 +311,6 @@ const revealObserver = new IntersectionObserver(
 );
 
 revealItems.forEach((item) => revealObserver.observe(item));
-
-educationSequence?.classList.add("education-sequence-ready");
 
 const chapterObserver = new IntersectionObserver(
   (entries) => {
@@ -521,7 +539,7 @@ const sectionTheme = (section) => {
   if (section.classList.contains("education")) return "final";
   if (section.classList.contains("milestones")) return "final";
   if (section.classList.contains("closing")) return "final";
-  if (section.classList.contains("signature-section")) return "final";
+  if (section.classList.contains("signature-section")) return "dark";
   if (section.classList.contains("profile")) return "light";
   if (section.classList.contains("achievements")) return "dark";
   if (section.classList.contains("projects")) return "dark";
@@ -677,7 +695,7 @@ const updateTheme = () => {
   if (!themeSections.length) return;
 
   const centeredElement = document.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2);
-  const centeredSection = centeredElement?.closest("main > section");
+  const centeredSection = centeredElement?.closest("main > section, .curtain-sequence > section");
   if (centeredSection) activeThemeSection = centeredSection;
   const activeSection = activeThemeSection || themeSections[0];
 
@@ -1234,6 +1252,7 @@ window.addEventListener("resize", () => {
   updateHeroMarqueeWidths();
   updateChapterTravel();
   updateTimelineMetrics();
+  updateCurtainMetrics();
   updateStoryMetrics();
   requestScrollUpdate();
   if (projectStack && isMobileProjectMode()) {
@@ -1253,12 +1272,14 @@ updateViewportWidth();
 updateMobileHeroLayout();
 updateChapterTravel();
 updateTimelineMetrics();
+updateCurtainMetrics();
 updateStoryMetrics();
 document.fonts?.ready.then(() => {
   updateMobileHeroLayout();
   updateHeroMarqueeWidths();
   updateChapterTravel();
   updateTimelineMetrics();
+  updateCurtainMetrics();
   updateStoryMetrics();
 });
 updateScroll();
@@ -1513,14 +1534,6 @@ const getStoryWindowInLens = (clientX, clientY) => {
 window.addEventListener("pointermove", (event) => {
   document.documentElement.style.setProperty("--bgx", `${event.clientX}px`);
   document.documentElement.style.setProperty("--bgy", `${event.clientY}px`);
-
-  const windowInLens = getStoryWindowInLens(event.clientX, event.clientY);
-  if (windowInLens) {
-    revealStoryWindow(windowInLens, event.clientX, event.clientY);
-    return;
-  }
-
-  clearStoryReveal();
 }, { passive: true });
 
 const applyReactiveMotion = (target, event) => {
@@ -1551,20 +1564,37 @@ if (window.matchMedia("(pointer: fine)").matches) {
   });
 }
 
-window.addEventListener("pointerup", clearStoryReveal, { passive: true });
-window.addEventListener("pointercancel", clearStoryReveal, { passive: true });
+const storyTapMode = window.matchMedia("(max-width: 860px), (hover: none), (pointer: coarse)");
+
+const setStoryWindowRevealed = (windowEl, revealed) => {
+  windowEl.classList.toggle("revealing", revealed);
+  windowEl.setAttribute("aria-pressed", revealed ? "true" : "false");
+};
 
 storyWindows.forEach((windowEl) => {
-  const activateWindow = (event, forceSpot = false) => {
-    revealStoryWindow(windowEl, event.clientX, event.clientY, forceSpot);
+  windowEl.setAttribute("role", "button");
+  windowEl.setAttribute("tabindex", "0");
+  windowEl.setAttribute("aria-pressed", "false");
+
+  const toggleWindow = () => {
+    const nextState = !windowEl.classList.contains("revealing");
+    storyWindows.forEach((otherWindow) => {
+      if (otherWindow !== windowEl) setStoryWindowRevealed(otherWindow, false);
+    });
+    setStoryWindowRevealed(windowEl, nextState);
   };
 
-  windowEl.addEventListener("pointerdown", (event) => {
-    windowEl.setPointerCapture?.(event.pointerId);
-    activateWindow(event, true);
+  windowEl.addEventListener("click", () => {
+    if (storyTapMode.matches) toggleWindow();
   });
-  windowEl.addEventListener("pointermove", activateWindow);
-  windowEl.addEventListener("pointerenter", (event) => activateWindow(event, true));
-  windowEl.addEventListener("pointerup", clearStoryReveal);
-  windowEl.addEventListener("pointercancel", clearStoryReveal);
+
+  windowEl.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    toggleWindow();
+  });
+});
+
+storyTapMode.addEventListener?.("change", () => {
+  storyWindows.forEach((windowEl) => setStoryWindowRevealed(windowEl, false));
 });

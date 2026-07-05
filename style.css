@@ -2,8 +2,8 @@
   --ink: #20251d;
   --ink-rgb: 32, 37, 29;
   --muted: #526048;
-  --black: #11170f;
-  --charcoal: #23311f;
+  --black: #24271e;
+  --charcoal: #24271e;
   --cream: #f3f3eb;
   --line: rgba(32, 37, 29, 0.16);
   --lime: #bfff00;
@@ -13,7 +13,7 @@
   --panel: rgba(255, 255, 247, 0.5);
   --panel-strong: rgba(255, 255, 247, 0.72);
   --page-a: #efeee6;
-  --page-dark: #111111;
+  --page-dark: #24271e;
   --page-final: #e2e5d8;
   --darkness: 0;
   --finalness: 0;
@@ -81,10 +81,10 @@ body.theme-dark {
   --panel-strong: rgba(25, 38, 22, 0.78);
   --accent-text: #bfff00;
   --shadow: rgba(0, 0, 0, 0.32);
-  --jcs-halo: rgba(17, 17, 17, 0.86);
-  --jcs-veil: rgba(17, 17, 17, 0.78);
-  --jcs-veil-soft: rgba(17, 17, 17, 0.44);
-  --jcs-veil-clear: rgba(17, 17, 17, 0);
+  --jcs-halo: rgba(36, 39, 30, 0.86);
+  --jcs-veil: rgba(36, 39, 30, 0.78);
+  --jcs-veil-soft: rgba(36, 39, 30, 0.44);
+  --jcs-veil-clear: rgba(36, 39, 30, 0);
 }
 
 body.theme-final {
@@ -832,7 +832,8 @@ body.theme-final .skill-group:hover {
   background-color: #c8ff00;
   --mx: -20%;
   --my: 50%;
-  touch-action: none;
+  cursor: pointer;
+  touch-action: pan-y;
 }
 
 .story-window::before {
@@ -867,7 +868,7 @@ body.theme-final .skill-group:hover {
   height: 100%;
   object-fit: cover;
   object-position: var(--pos, 50% 50%);
-  opacity: 0;
+  opacity: 1;
   transform: scale(1.02);
   clip-path: none;
   transition:
@@ -881,6 +882,55 @@ body.theme-final .skill-group:hover {
   inset: 0;
   z-index: 5;
   pointer-events: none;
+  background: transparent;
+  transform: translate3d(0, 0, 0);
+  transition: transform 720ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: 0ms;
+  isolation: isolate;
+  will-change: transform;
+}
+
+.cover-layer::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  z-index: 0;
+  width: 112%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #d6ff00, #baff00);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.cover-layer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(135deg, #d6ff00, #baff00);
+  pointer-events: none;
+}
+
+.cover-layer > * {
+  z-index: 1;
+}
+
+.story-window.revealing .cover-layer {
+  transform: translate3d(0, 180%, 0);
+  transition-duration: 920ms;
+  transition-timing-function: cubic-bezier(0.72, 0, 0.18, 1);
+  transition-delay: 150ms;
+}
+
+@media (min-width: 861px) and (hover: hover) and (pointer: fine) {
+  .story-window:hover .cover-layer {
+    transform: translate3d(0, 180%, 0);
+    transition-duration: 920ms;
+    transition-timing-function: cubic-bezier(0.72, 0, 0.18, 1);
+    transition-delay: 150ms;
+  }
 }
 
 .reveal-canvas {
@@ -909,10 +959,21 @@ body.theme-final .skill-group:hover {
   color: #11170f;
   background: transparent;
   border: 0;
-  font-size: 0.78rem;
+  font-size: 0;
   font-weight: 900;
   text-transform: uppercase;
   box-shadow: none;
+}
+
+.hover-hint::after {
+  content: "Hover to reveal";
+  font-size: 0.78rem;
+}
+
+@media (max-width: 860px), (hover: none), (pointer: coarse) {
+  .hover-hint::after {
+    content: "Tap to reveal";
+  }
 }
 
 .story-kicker {
@@ -1152,7 +1213,7 @@ body.theme-final .skill-group:hover {
   position: absolute;
   inset: auto 0 0;
   padding: 24px;
-  background: linear-gradient(rgba(16, 17, 15, 0), rgba(16, 17, 15, 0.86) 22%, rgba(16, 17, 15, 0.98));
+  background: linear-gradient(rgba(36, 39, 30, 0), rgba(36, 39, 30, 0.86) 22%, rgba(36, 39, 30, 0.98));
   transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -1197,7 +1258,7 @@ body.theme-final .skill-group:hover {
 .timeline-item {
   min-height: 220px;
   padding: 22px;
-  background: rgba(16, 17, 15, 0.68);
+  background: rgba(36, 39, 30, 0.68);
 }
 
 .tournament-grid {
@@ -2263,16 +2324,35 @@ body.theme-dark .education-mark {
 }
 
 .signature-section {
+  --signature-bg-progress: 0;
+  --ink: #f3f7ea;
+  --ink-rgb: 243, 247, 234;
+  --muted: #c1cbb7;
+  --line: rgba(243, 247, 234, 0.2);
   position: relative;
   min-height: 100svh;
   margin-top: clamp(-180px, -14svh, -110px);
   padding: 0;
+  color: var(--ink);
   background: var(--page-final);
+  isolation: isolate;
+}
+
+.signature-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--page-dark);
+  opacity: var(--signature-bg-progress);
+  pointer-events: none;
+  will-change: opacity;
 }
 
 .signature-stage {
   position: absolute;
   inset: 0;
+  z-index: 1;
   min-height: 0;
   display: grid;
   place-content: center;
@@ -2371,7 +2451,7 @@ body.theme-dark .education-mark {
   display: grid;
   place-items: center;
   padding: clamp(18px, 4vw, 56px);
-  background: rgba(12, 17, 11, 0.78);
+  background: rgba(36, 39, 30, 0.82);
   backdrop-filter: blur(18px);
   opacity: 0;
   pointer-events: none;
@@ -2394,7 +2474,7 @@ body.theme-dark .education-mark {
   overflow: hidden;
   border: 1px solid rgba(243, 247, 234, 0.18);
   border-radius: 26px;
-  background: #151d13;
+  background: var(--page-dark);
   box-shadow: 0 40px 120px rgba(0, 0, 0, 0.42);
   transform: scale(0.94) translateY(18px);
   transition: transform 460ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -2406,7 +2486,7 @@ body.theme-dark .education-mark {
 
 .detail-media {
   min-height: 0;
-  background: #0e140d;
+  background: var(--page-dark);
   overflow: hidden;
 }
 
@@ -3144,7 +3224,68 @@ body.theme-dark .education-mark {
 .projects {
   display: block;
   width: min(calc(100% - 40px), 1500px);
+  min-height: 100svh;
   padding-bottom: clamp(110px, 12vw, 190px);
+}
+
+/* Beyond Chess pins at its final viewport position while Volunteering rises
+   over it like a curtain. */
+.curtain-sequence {
+  position: relative;
+  isolation: isolate;
+  background: var(--page-dark);
+}
+
+.curtain-hold {
+  position: relative;
+  z-index: 2;
+  height: clamp(220px, 42svh, 460px);
+  pointer-events: none;
+}
+
+#projects {
+  --ink: #f3f7ea;
+  --ink-rgb: 243, 247, 234;
+  --muted: #c1cbb7;
+  --line: rgba(243, 247, 234, 0.2);
+  --accent-text: #bfff00;
+  position: sticky;
+  top: var(--curtain-sticky-top, 0px);
+  z-index: 1;
+  color: var(--ink);
+  background: var(--page-dark);
+}
+
+body.curtain-in-progress .hero-monogram span {
+  color: #f3f7ea;
+  -webkit-text-fill-color: #f3f7ea;
+  text-shadow: 0 1px 14px rgba(17, 17, 17, 0.86);
+}
+
+body.curtain-in-progress .hero-monogram span[data-jcs-letter="s"] {
+  color: rgba(243, 247, 234, var(--jcs-s-fill, 1));
+  -webkit-text-fill-color: rgba(243, 247, 234, var(--jcs-s-fill, 1));
+  -webkit-text-stroke: var(--jcs-s-stroke, 0px) #f3f7ea;
+}
+
+#contact.closing {
+  --ink: #20251d;
+  --ink-rgb: 32, 37, 29;
+  --muted: #596352;
+  --line: rgba(32, 37, 29, 0.16);
+  --accent-text: #526048;
+  z-index: 3;
+  min-height: 100svh;
+  color: var(--ink);
+  background: var(--page-final);
+  box-shadow: none;
+}
+
+#timeline.milestones {
+  z-index: 1;
+  margin-top: -1px;
+  border-top: 0;
+  background: var(--page-final);
 }
 
 .projects > .section-heading {
@@ -3186,7 +3327,7 @@ body.theme-dark .education-mark {
   min-height: 0;
   aspect-ratio: 4 / 5;
   opacity: 0;
-  background: #11130f;
+  background: var(--page-dark);
   filter: brightness(0.82) saturate(0.84);
   transform: translate3d(
       calc(-50% + var(--layer-x) + var(--effective-nudge)),
