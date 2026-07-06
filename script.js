@@ -3,6 +3,12 @@ if ("scrollRestoration" in history) {
   history.scrollRestoration = "manual";
 }
 
+const resetInitialScroll = () => window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+if (window.location.hash) {
+  history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+}
+resetInitialScroll();
+
 const imageCards = document.querySelectorAll(".image-card");
 const revealItems = document.querySelectorAll(".reveal");
 const scrollStory = document.querySelector(".scroll-story");
@@ -15,6 +21,10 @@ const hero = document.querySelector(".hero");
 const heroStage = document.querySelector(".hero-stage");
 const projectsSection = document.querySelector("#projects");
 const contactSection = document.querySelector("#contact");
+const volunteerStory = document.querySelector("[data-volunteer-story]");
+const volunteerStage = volunteerStory?.querySelector(".volunteer-stage");
+const volunteerTrack = volunteerStory?.querySelector(".volunteer-track");
+const volunteerScenes = Array.from(volunteerStory?.querySelectorAll(".volunteer-scene") || []);
 const monogramLetters = {
   j: document.querySelector('[data-jcs-letter="j"]'),
   c: document.querySelector('[data-jcs-letter="c"]'),
@@ -39,6 +49,7 @@ let timelineLastProgress = -1;
 let timelineLastIndex = -1;
 let timelineVisible = false;
 let storyMetrics = null;
+let volunteerStoryMetrics = null;
 let viewportWidth = 0;
 let heroTransitionComplete = false;
 const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -107,10 +118,30 @@ const updateSignatureProgress = () => {
 
   const viewportHeight = Math.max(1, window.innerHeight);
   const sectionRect = signatureSection.getBoundingClientRect();
-  const rawBackgroundProgress = (viewportHeight * 0.92 - sectionRect.top) / (viewportHeight * 0.7);
+  const rawBackgroundProgress = (viewportHeight * 0.72 - sectionRect.top) / (viewportHeight * 0.34);
   const backgroundProgress = Math.min(1, Math.max(0, rawBackgroundProgress));
   const easedBackgroundProgress = backgroundProgress * backgroundProgress * (3 - 2 * backgroundProgress);
-  signatureSection.style.setProperty("--signature-bg-progress", easedBackgroundProgress.toFixed(4));
+  const lightColor = [226, 229, 216];
+  const darkColor = [36, 39, 30];
+  const blendedColor = lightColor.map((channel, index) =>
+    Math.round(channel + (darkColor[index] - channel) * easedBackgroundProgress)
+  );
+  document.documentElement.style.setProperty("--signature-bg-progress", easedBackgroundProgress.toFixed(4));
+  document.documentElement.style.setProperty("--signature-bg-color", `rgb(${blendedColor.join(", ")})`);
+  const blend = (from, to) => from.map((channel, index) =>
+    Math.round(channel + (to[index] - channel) * easedBackgroundProgress)
+  );
+  const timelineInk = blend([32, 37, 29], [243, 247, 234]);
+  const timelineMuted = blend([82, 96, 72], [193, 203, 183]);
+  const timelinePanel = blend([255, 255, 247], [49, 54, 42]);
+  const timelineBorder = blend([32, 37, 29], [243, 247, 234]);
+  const timelineShadow = blend([32, 37, 29], [0, 0, 0]);
+  document.documentElement.style.setProperty("--timeline-ink-color", `rgb(${timelineInk.join(", ")})`);
+  document.documentElement.style.setProperty("--timeline-muted-color", `rgb(${timelineMuted.join(", ")})`);
+  document.documentElement.style.setProperty("--timeline-panel-color", `rgba(${timelinePanel.join(", ")}, ${(0.54 + easedBackgroundProgress * 0.34).toFixed(3)})`);
+  document.documentElement.style.setProperty("--timeline-border-color", `rgba(${timelineBorder.join(", ")}, ${(0.13 + easedBackgroundProgress * 0.09).toFixed(3)})`);
+  document.documentElement.style.setProperty("--timeline-line-color", `rgba(${timelineBorder.join(", ")}, ${(0.15 + easedBackgroundProgress * 0.05).toFixed(3)})`);
+  document.documentElement.style.setProperty("--timeline-shadow-color", `rgba(${timelineShadow.join(", ")}, ${(0.11 + easedBackgroundProgress * 0.17).toFixed(3)})`);
   const photoTop = sectionRect.top + signaturePaper.offsetTop;
   const photoBottom = photoTop + signaturePaper.offsetHeight;
   const photoProgress = Math.min(1, Math.max(0, (viewportHeight * 0.97 - photoTop) / (viewportHeight * 0.24)));
@@ -262,11 +293,42 @@ const updateStoryMetrics = () => {
   };
 };
 
+const updateVolunteerStoryMetrics = () => {
+  if (!volunteerStory || !volunteerStage || !volunteerTrack || !volunteerScenes.length) return;
+  const firstScene = volunteerScenes[0];
+  const lastScene = volunteerScenes[volunteerScenes.length - 1];
+  const viewportCenter = document.documentElement.clientWidth / 2;
+  const firstCenter = firstScene.offsetLeft + firstScene.offsetWidth / 2;
+  const lastCenter = lastScene.offsetLeft + lastScene.offsetWidth / 2;
+  const startShift = viewportCenter - firstCenter;
+  const endShift = viewportCenter - lastCenter;
+  const horizontalTravel = Math.abs(endShift - startShift);
+  const stageHeight = volunteerStage.clientHeight || window.innerHeight;
+
+  volunteerStoryMetrics = { startShift, endShift, horizontalTravel, stageHeight };
+  volunteerStory.style.height = `${Math.ceil(stageHeight + horizontalTravel)}px`;
+};
+
+const updateVolunteerStory = () => {
+  if (!volunteerStory || !volunteerTrack || !volunteerStoryMetrics) return;
+  const rect = volunteerStory.getBoundingClientRect();
+  const travel = Math.max(1, volunteerStoryMetrics.horizontalTravel);
+  const rawProgress = -rect.top / travel;
+  const progress = Math.min(1, Math.max(0, rawProgress));
+  const shift = volunteerStoryMetrics.startShift
+    + (volunteerStoryMetrics.endShift - volunteerStoryMetrics.startShift) * progress;
+  volunteerTrack.style.transform = `translate3d(${shift.toFixed(2)}px, 0, 0)`;
+
+  const viewportCenter = window.innerWidth / 2;
+  volunteerScenes.forEach((scene) => {
+    const sceneRect = scene.getBoundingClientRect();
+    const distance = Math.min(1, Math.abs(sceneRect.left + sceneRect.width / 2 - viewportCenter) / window.innerWidth);
+    scene.style.setProperty("--scene-distance", distance.toFixed(3));
+  });
+};
+
 window.setTimeout(() => {
   document.body.classList.remove("intro-lock");
-  if (window.location.hash === "#profile") {
-    window.scrollTo(0, document.querySelector("#profile")?.offsetTop || 0);
-  }
   updateScroll();
   /* Freeze intro-animation end-state so the forwards fill is no longer
      needed.  When .scrolling is later toggled, the base styles will be
@@ -297,6 +359,7 @@ const updateScroll = () => {
   updateTimelineProgress();
   updateSignatureProgress();
   updateStoryTrack();
+  updateVolunteerStory();
   updateTheme();
   updateHighlights();
 };
@@ -1254,6 +1317,7 @@ window.addEventListener("resize", () => {
   updateTimelineMetrics();
   updateCurtainMetrics();
   updateStoryMetrics();
+  updateVolunteerStoryMetrics();
   requestScrollUpdate();
   if (projectStack && isMobileProjectMode()) {
     requestAnimationFrame(() => scrollMobileProjectTo(mobileProjectActiveIndex, "auto"));
@@ -1274,6 +1338,7 @@ updateChapterTravel();
 updateTimelineMetrics();
 updateCurtainMetrics();
 updateStoryMetrics();
+updateVolunteerStoryMetrics();
 document.fonts?.ready.then(() => {
   updateMobileHeroLayout();
   updateHeroMarqueeWidths();
@@ -1281,6 +1346,8 @@ document.fonts?.ready.then(() => {
   updateTimelineMetrics();
   updateCurtainMetrics();
   updateStoryMetrics();
+  updateVolunteerStoryMetrics();
+  updateVolunteerStory();
 });
 updateScroll();
 
