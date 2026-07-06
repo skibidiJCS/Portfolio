@@ -645,7 +645,15 @@ const updateHeroTransition = () => {
     source.style.webkitTextStroke = jcsActive ? "0 transparent" : "";
   });
   document.documentElement.style.setProperty("--hero-progress", progress.toFixed(3));
+  const wasJcsActive = hero.classList.contains("scrolling");
   hero.classList.toggle("scrolling", jcsActive);
+
+  // The entry animation can still be moving the title on the first scroll.
+  // Capture again after the scrolling state settles it into its final layout.
+  if (jcsActive && !wasJcsActive) {
+    heroLetterStarts = null;
+    captureHeroLetterStarts();
+  }
 
   if (!heroStage) return;
   ensureHeroLetterStarts(progress);

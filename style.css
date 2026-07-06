@@ -604,6 +604,83 @@ h1 .hero-name-last {
   -webkit-text-stroke: 2px var(--ink);
 }
 
+.hero-letter-o {
+  position: relative;
+  display: inline-block;
+  isolation: isolate;
+}
+
+.hero-letter-n {
+  display: inline;
+}
+
+.hero-o-character {
+  position: absolute;
+  z-index: 2;
+  top: 0.12em;
+  left: 50%;
+  width: 0.43em;
+  aspect-ratio: 595 / 1258;
+  pointer-events: none;
+  transform: translateX(-50%);
+  transform-origin: 50% 52%;
+  -webkit-text-stroke: 0;
+}
+
+.hero-o-character-part {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center top;
+  z-index: 1;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.hero-o-character-body {
+  clip-path: inset(0 0 29% 0);
+}
+
+.hero-o-character-leg {
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.hero-o-character-leg-left {
+  clip-path: polygon(0 66%, 53% 66%, 53% 100%, 0 100%);
+  transform-origin: 43% 68%;
+  animation: heroLegSwingLeft 340ms cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
+}
+
+.hero-o-character-leg-right {
+  clip-path: polygon(47% 66%, 100% 66%, 100% 100%, 47% 100%);
+  transform-origin: 57% 68%;
+  animation: heroLegSwingRight 340ms cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
+}
+
+@keyframes heroLegSwingLeft {
+  from { transform: rotate(1.2deg) translateY(0); }
+  to { transform: rotate(-2.2deg) translateY(0.008em); }
+}
+
+@keyframes heroLegSwingRight {
+  from { transform: rotate(-1.2deg) translateY(0.008em); }
+  to { transform: rotate(2.2deg) translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-o-character-leg {
+    animation: none;
+  }
+}
+
+.hero h1 {
+  margin-bottom: clamp(56px, 7vw, 88px);
+}
+
 .hero-copy {
   max-width: 620px;
   color: var(--muted);
@@ -2377,7 +2454,7 @@ body.theme-dark .education-mark {
   --line: rgba(243, 247, 234, 0.2);
   position: relative;
   min-height: 100svh;
-  margin-top: clamp(-180px, -14svh, -110px);
+  margin-top: 0;
   padding: 0;
   color: var(--ink);
   background: var(--signature-bg-color, var(--page-final));
@@ -3230,7 +3307,7 @@ body.theme-dark .education-mark {
 
   .signature-section {
     min-height: 100svh;
-    margin-top: clamp(-180px, -19svh, -110px);
+    margin-top: 0;
     padding: 0;
   }
 
@@ -3867,7 +3944,7 @@ body.curtain-in-progress .hero-monogram span[data-jcs-letter="s"] {
 
 .volunteer-intro .closing-inner {
   position: relative;
-  top: clamp(96px, 18svh, 180px);
+  top: 0;
   width: min(calc(100% - 24px), 1580px);
 }
 
@@ -3891,6 +3968,7 @@ body.curtain-in-progress .hero-monogram span[data-jcs-letter="s"] {
 
 .volunteer-story {
   position: relative;
+  margin-top: -20svh;
   min-height: 100svh;
   background: var(--page-final);
 }
@@ -4007,8 +4085,12 @@ body.curtain-in-progress .hero-monogram span[data-jcs-letter="s"] {
   }
 
   .volunteer-intro .closing-inner {
-    top: clamp(120px, 24svh, 210px);
+    top: 0;
     width: 100%;
+  }
+
+  .volunteer-story {
+    margin-top: -24svh;
   }
 
   .closing .volunteer-statement {
