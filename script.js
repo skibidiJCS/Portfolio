@@ -172,6 +172,7 @@ const layerCards = Array.from(document.querySelectorAll(".layer-card"));
 const projectSnapDots = document.querySelector(".project-snap-dots");
 const detailCards = document.querySelectorAll("[data-detail-image]");
 const detailView = document.querySelector(".detail-view");
+const detailClose = detailView?.querySelector(".detail-close");
 const detailImage = detailView?.querySelector(".detail-media img");
 const detailLabel = detailView?.querySelector(".detail-label");
 const detailTitle = detailView?.querySelector(".detail-copy h2");
@@ -280,17 +281,8 @@ const updateTimelineProgress = () => {
 };
 
 const updateStoryMetrics = () => {
-  if (!scrollStory || !storyTrack || !storySlides.length) return;
-  const firstSlide = storySlides[0];
-  const lastSlide = storySlides[storySlides.length - 1];
-  const scrollRect = scrollStory.getBoundingClientRect();
-  const paddingLeft = Number.parseFloat(getComputedStyle(scrollStory).paddingLeft || "0");
-  const viewportCenter = document.documentElement.clientWidth / 2;
-  const trackBaseLeft = scrollRect.left + paddingLeft;
-  storyMetrics = {
-    startShift: viewportCenter - trackBaseLeft - (firstSlide.offsetLeft + firstSlide.offsetWidth / 2),
-    endShift: viewportCenter - trackBaseLeft - (lastSlide.offsetLeft + lastSlide.offsetWidth / 2),
-  };
+  storyMetrics = null;
+  storyTrack?.style.removeProperty("transform");
 };
 
 const updateVolunteerStoryMetrics = () => {
@@ -574,23 +566,7 @@ const activateStorySlide = (slide) => {
 };
 
 const updateStoryTrack = () => {
-  if (!scrollStory || !storyTrack || !storySlides.length) return;
-  if (window.matchMedia("(max-width: 860px)").matches) {
-    if (storyTrack.style.transform) storyTrack.style.transform = "";
-    return;
-  }
-
-  const rect = scrollStory.getBoundingClientRect();
-  const travel = Math.max(1, rect.height - window.innerHeight);
-  const raw = -rect.top / travel;
-  const progress = Math.min(1, Math.max(0, raw));
-  if (!storyMetrics) updateStoryMetrics();
-  if (!storyMetrics) return;
-  const shift = storyMetrics.startShift + (storyMetrics.endShift - storyMetrics.startShift) * progress;
-  storyTrack.style.transform = `translate3d(${shift}px, 0, 0)`;
-
-  const index = Math.min(storySlides.length - 1, Math.max(0, Math.round(progress * (storySlides.length - 1))));
-  activateStorySlide(storySlides[index]);
+  if (storyTrack?.style.transform) storyTrack.style.removeProperty("transform");
 };
 
 const sectionTheme = (section) => {
@@ -682,7 +658,7 @@ const updateHeroTransition = () => {
   const isShortLandscape = window.innerWidth < 860 && window.innerHeight < 560;
   const finalScale = isMobile ? 0.4 : isShortLandscape ? 0.44 : 0.36;
   const cardScale = 1 + (finalScale - 1) * zoomProgress;
-  const marqueeOpacity = smoothstep(0.42, 0.72, progress);
+  const marqueeOpacity = progress > 0.08 ? 1 : 0;
   heroStage.style.setProperty("--hero-side-opacity", "1");
   heroStage.style.setProperty("--hero-title-opacity", "1");
   heroStage.style.setProperty("--hero-photo-opacity", "1");
@@ -1266,6 +1242,7 @@ const openDetail = (card) => {
   detailView.classList.add("open");
   detailView.setAttribute("aria-hidden", "false");
   document.body.classList.add("detail-open");
+  requestAnimationFrame(() => detailClose?.focus());
 };
 
 const closeDetail = () => {
@@ -1293,6 +1270,8 @@ detailCards.forEach((card) => {
 detailView?.addEventListener("click", (event) => {
   if (event.target === detailView) closeDetail();
 });
+
+detailClose?.addEventListener("click", closeDetail);
 
 window.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && detailView?.classList.contains("open")) closeDetail();
