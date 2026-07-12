@@ -218,7 +218,9 @@ const updateChapterTravel = () => {
 
   chapters.forEach((chapter) => {
     const word = chapter.querySelector("b");
-    const wordWidth = word?.getBoundingClientRect().width || 0;
+    const wordRect = word?.getBoundingClientRect();
+    const chapterRect = chapter.getBoundingClientRect();
+    const wordWidth = wordRect?.width || 0;
     const revealClearance = isMobile
       ? Math.max(0, (wordWidth - viewportWidth) * 0.5 + 24)
       : 0;
@@ -226,6 +228,12 @@ const updateChapterTravel = () => {
     const travel = Math.max(baseTravel, revealClearance * visibilityMultiplier);
     chapterTravel.set(chapter, travel);
     chapter.style.setProperty("--chapter-travel", `${travel.toFixed(2)}px`);
+
+    if (wordRect) {
+      const batonGap = Math.max(18, Math.min(38, window.innerHeight * 0.032));
+      const batonTop = wordRect.bottom - chapterRect.top + batonGap;
+      chapter.style.setProperty("--chapter-baton-top", `${batonTop.toFixed(2)}px`);
+    }
   });
 };
 
@@ -838,6 +846,8 @@ const getLayerFanScales = () => (
     : [0.92, 0.96, 1, 0.96, 0.92]
 );
 
+const getLayerFanRotations = () => [-8, -4, 0, 4, 8];
+
 const applyLayerMotion = () => {
   layerCards.forEach((card, index) => {
     const state = layerMotion[index];
@@ -884,10 +894,10 @@ const animateLayerMotion = (time) => {
   layerMotion.forEach((state) => {
     const response = state.response;
     const responseRoot = Math.sqrt(response);
-    moving = springLayerValue(state, "x", "velocityX", "targetX", 260 * response, 30 * responseRoot, 760, delta) || moving;
-    moving = springLayerValue(state, "y", "velocityY", "targetY", 270 * response, 31 * responseRoot, 220, delta) || moving;
-    moving = springLayerValue(state, "scale", "velocityScale", "targetScale", 300 * response, 35 * responseRoot, 1.2, delta) || moving;
-    moving = springLayerValue(state, "rotation", "velocityRotation", "targetRotation", 230 * response, 27 * responseRoot, 15, delta) || moving;
+    moving = springLayerValue(state, "x", "velocityX", "targetX", 190 * response, 20.5 * responseRoot, 920, delta) || moving;
+    moving = springLayerValue(state, "y", "velocityY", "targetY", 210 * response, 22 * responseRoot, 320, delta) || moving;
+    moving = springLayerValue(state, "scale", "velocityScale", "targetScale", 240 * response, 23 * responseRoot, 1.8, delta) || moving;
+    moving = springLayerValue(state, "rotation", "velocityRotation", "targetRotation", 180 * response, 19 * responseRoot, 24, delta) || moving;
   });
 
   applyLayerMotion();
@@ -929,41 +939,50 @@ const setActiveLayer = (index, { lift = true } = {}) => {
   layerIsLifted = lift;
   projectStack.classList.add("has-layer-focus");
   const coarsePointer = usesCoarseLayerPointer();
+  const desktopInteraction = !coarsePointer && !isMobileProjectMode();
   const fanScales = getLayerFanScales();
-  const activeScale = 1.01;
+  const fanRotations = getLayerFanRotations();
+  const activeScale = desktopInteraction ? 1.075 : 1.01;
+  const desktopPush = Math.min(78, Math.max(56, window.innerWidth * 0.055));
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   layerCards.forEach((card, cardIndex) => {
     const isActive = cardIndex === activeLayerIndex;
     const distance = Math.abs(cardIndex - activeLayerIndex);
     const direction = cardIndex < activeLayerIndex ? -1 : 1;
-    const nudge = isActive
-      ? 0
-      : direction * ((coarsePointer ? 10 : 28) + distance * (coarsePointer ? 6 : 14));
+    const push = desktopInteraction
+      ? desktopPush * Math.pow(0.62, Math.max(0, distance - 1))
+      : (10 + distance * 6);
+    const nudge = isActive ? 0 : direction * push;
     card.classList.toggle("is-layer-active", isActive);
     card.setAttribute("aria-pressed", isActive ? "true" : "false");
     card.style.zIndex = String(isActive ? 50 : 40 - distance * 5);
     card.style.setProperty("--layer-nudge", `${nudge}px`);
 
     const state = layerMotion[cardIndex];
-    const outwardRotation = isActive
-      ? 0
-      : direction * Math.min(0.8, 0.32 + distance * 0.12);
+    const baseRotation = fanRotations[cardIndex] || 0;
+    const outwardRotation = desktopInteraction
+      ? (isActive ? -baseRotation * 0.1 : direction * (1.15 / Math.max(1, distance)))
+      : (isActive ? 0 : direction * Math.min(0.8, 0.32 + distance * 0.12));
     state.layoutX = nudge;
-    state.layoutY = isActive && lift ? (coarsePointer ? -4 : -7) : 0;
-    state.layoutScale = isActive ? activeScale - fanScales[cardIndex] : 0;
+    state.layoutY = isActive && lift
+      ? (desktopInteraction ? -18 : -4)
+      : (desktopInteraction && distance === 1 ? 3 : 0);
+    state.layoutScale = isActive
+      ? activeScale - fanScales[cardIndex]
+      : (desktopInteraction ? -Math.max(0, 0.01 - distance * 0.002) : 0);
     state.layoutRotation = outwardRotation;
-    state.response = isActive ? 1 : Math.max(0.72, 1 - distance * 0.08);
+    state.response = isActive ? 1.05 : Math.max(0.68, 0.92 - distance * 0.07);
     state.targetX = state.layoutX;
     state.targetY = state.layoutY;
     state.targetScale = state.layoutScale;
     state.targetRotation = state.layoutRotation;
 
     if (activeChanged && projectStack.classList.contains("layers-physics")) {
-      state.velocityX *= 0.22;
-      state.velocityY *= 0.22;
-      state.velocityScale *= 0.22;
-      state.velocityRotation *= 0.22;
+      state.velocityX *= 0.92;
+      state.velocityY *= 0.92;
+      state.velocityScale *= 0.92;
+      state.velocityRotation *= 0.92;
     }
 
     if (reducedMotion && projectStack.classList.contains("layers-physics")) {
@@ -1058,10 +1077,12 @@ if (projectStack && layerCards.length) {
 
     layerMotion.forEach((state, index) => {
       const distance = Math.abs(index - activeLayerIndex);
-      const connection = distance === 0 ? 1 : 0.18 / distance;
-      state.targetX = state.layoutX + pointerX * 3 * connection;
-      state.targetY = state.layoutY + pointerVertical * 2 * connection;
-      state.targetScale = state.layoutScale;
+      const isActive = index === activeLayerIndex;
+      const connection = isActive ? 1 : 0.24 / Math.max(1, distance);
+      state.targetX = state.layoutX + pointerX * 7 * connection;
+      state.targetY = state.layoutY + pointerVertical * 5 * connection;
+      state.targetScale = state.layoutScale + (isActive ? 0.006 : 0);
+      state.targetRotation = state.layoutRotation + pointerX * (isActive ? 1.15 : 0.32 * connection);
     });
     requestLayerMotion();
   };
@@ -1094,9 +1115,10 @@ if (projectStack && layerCards.length) {
     });
 
     const activeDistance = Math.abs(pointerRatio - positions[activeLayerIndex]);
-    if (candidate !== activeLayerIndex && candidateDistance + 0.018 < activeDistance) {
-      setActiveLayer(candidate);
-    } else if (candidate === activeLayerIndex && !layerIsLifted) {
+    const hasMovedBeyondActiveZone = candidateDistance + 0.012 < activeDistance;
+    if (candidate !== activeLayerIndex && hasMovedBeyondActiveZone) setActiveLayer(candidate);
+
+    if (candidate === activeLayerIndex && !layerIsLifted) {
       setActiveLayer(activeLayerIndex);
     }
 
@@ -1130,6 +1152,7 @@ if (projectStack && layerCards.length) {
 
 let mobileProjectActiveIndex = 2;
 let mobileProjectVisualFrame = 0;
+let mobileProjectSettleTimer = 0;
 
 const clampValue = (value, min, max) => Math.min(max, Math.max(min, value));
 
@@ -1191,12 +1214,26 @@ const scrollMobileProjectTo = (index, behavior = "smooth") => {
   if (!projectStack || !isMobileProjectMode()) return;
   const target = mobileProjectTarget(layerCards[index]);
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  projectStack.scrollTo({
-    left: target,
-    behavior: reducedMotion ? "auto" : behavior,
-  });
+  const resolvedBehavior = reducedMotion ? "auto" : behavior;
+  window.clearTimeout(mobileProjectSettleTimer);
+  projectStack.classList.add("mobile-project-scrolling");
   updateMobileProjectDots(index);
-  requestMobileProjectVisuals();
+
+  if (resolvedBehavior === "auto") {
+    projectStack.scrollLeft = target;
+    requestAnimationFrame(() => {
+      projectStack.classList.remove("mobile-project-scrolling");
+      updateMobileProjectVisuals();
+    });
+    return;
+  }
+
+  projectStack.scrollTo({ left: target, behavior: "smooth" });
+  mobileProjectSettleTimer = window.setTimeout(() => {
+    projectStack.scrollLeft = target;
+    projectStack.classList.remove("mobile-project-scrolling");
+    updateMobileProjectVisuals();
+  }, 520);
 };
 
 if (projectStack && layerCards.length && projectSnapDots) {
@@ -1207,7 +1244,11 @@ if (projectStack && layerCards.length && projectSnapDots) {
     dot.addEventListener("click", () => scrollMobileProjectTo(index));
     projectSnapDots.appendChild(dot);
   });
-  projectStack.addEventListener("scroll", requestMobileProjectVisuals, { passive: true });
+  projectStack.addEventListener("scroll", () => {
+    if (!projectStack.classList.contains("mobile-project-scrolling")) {
+      requestMobileProjectVisuals();
+    }
+  }, { passive: true });
 
   const configureMobileProjects = () => {
     if (isMobileProjectMode()) {
@@ -1297,21 +1338,26 @@ const requestScrollUpdate = () => {
 window.addEventListener("scroll", requestScrollUpdate, { passive: true });
 window.addEventListener("resize", () => {
   heroTransitionComplete = false;
+  const viewportWidthChanged = document.documentElement.clientWidth !== viewportWidth;
   updateViewportWidth();
   updateMobileHeroLayout();
   updateHeroMarqueeWidths();
   updateChapterTravel();
   updateTimelineMetrics();
-  updateCurtainMetrics();
   updateStoryMetrics();
-  updateVolunteerStoryMetrics();
+  if (viewportWidthChanged || !isMobileProjectMode()) {
+    updateCurtainMetrics();
+    updateVolunteerStoryMetrics();
+  }
   requestScrollUpdate();
   if (projectStack && isMobileProjectMode()) {
-    requestAnimationFrame(() => scrollMobileProjectTo(mobileProjectActiveIndex, "auto"));
+    if (viewportWidthChanged) {
+      requestAnimationFrame(() => scrollMobileProjectTo(mobileProjectActiveIndex, "auto"));
+    }
   } else if (projectStack) {
     setActiveLayer(activeLayerIndex, { lift: layerIsLifted });
   }
-  if (!highlightBlocks.length) return;
+  if (!highlightBlocks.length || (!viewportWidthChanged && isMobileProjectMode())) return;
   window.clearTimeout(highlightResizeTimer);
   highlightResizeTimer = window.setTimeout(() => {
     highlightBlocks.forEach(splitHighlightLines);
@@ -1632,9 +1678,6 @@ storyWindows.forEach((windowEl) => {
 
   const toggleWindow = () => {
     const nextState = !windowEl.classList.contains("revealing");
-    storyWindows.forEach((otherWindow) => {
-      if (otherWindow !== windowEl) setStoryWindowRevealed(otherWindow, false);
-    });
     setStoryWindowRevealed(windowEl, nextState);
   };
 
