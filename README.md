@@ -1,6 +1,6 @@
-# Jiacai Song portfolio
+# portfolio
 
-Code for personal portfolio website
+code for personal portfolio website
 
 ## live website
 https://jiacaisong.vercel.app
