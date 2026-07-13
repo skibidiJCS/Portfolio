@@ -25,6 +25,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="assets/vendor/lenis.css" />
   </head>
   <body>
     <div class="noise" aria-hidden="true"></div>
@@ -85,7 +86,7 @@
       <section id="achievements" class="achievements">
         <div class="section-heading reveal">
           <p class="eyebrow">Chess</p>
-          <h2>Competition results and major tournaments.</h2>
+          <h2 class="text-highlight chess-heading-highlight" data-highlight-base="0">Competition results and major tournaments.</h2>
         </div>
 
         <div class="scroll-story" aria-label="Chess achievements grid">
@@ -110,7 +111,7 @@
             </article>
 
             <article class="story-slide reveal">
-              <div class="story-window" style="--pos: 50% 45%">
+              <div class="story-window" style="--pos: 50% 82%">
                 <img src="assets/team-quebec-ontario-2025-1st.jpg" alt="Quebec vs Ontario team tournament 2025 winners" />
                 <div class="cover-clip">
                   <div class="cover-layer">
@@ -167,7 +168,7 @@
             </article>
 
             <article class="story-slide reveal">
-              <div class="story-window" style="--pos: 38% 50%">
+              <div class="story-window" style="--pos: 50% 38%">
                 <img src="assets/naycc-2025.jpg" alt="North American Youth Chess Championship 2025 in Kingston" />
                 <div class="cover-clip">
                   <div class="cover-layer">
@@ -275,6 +276,8 @@
             data-detail-label="Hackathon"
             data-detail-title="MariHacks IX"
             data-detail-copy="Winner at MariHacks IX, Quebec's first and largest hackathon for CEGEP and high school students. Our project, LookLens, won Best Use of Google Gemma."
+            data-detail-link="https://devpost.com/software/looklens"
+            data-detail-link-label="View LookLens on Devpost"
           >
             <img
               class="marihacks-photo"
@@ -431,10 +434,14 @@
           <span class="detail-label"></span>
           <h2 id="detail-title"></h2>
           <p></p>
+          <a class="detail-link" href="" target="_blank" rel="noopener noreferrer" hidden></a>
         </div>
       </div>
     </div>
 
+    <script src="assets/vendor/lenis.min.js"></script>
+    <script src="assets/vendor/gsap.min.js"></script>
+    <script src="assets/vendor/ScrollTrigger.min.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

@@ -3,7 +3,7 @@ if ("scrollRestoration" in history) {
   history.scrollRestoration = "manual";
 }
 
-const resetInitialScroll = () => window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+const resetInitialScroll = () => window.scrollTo({ top: 0, left: 0, behavior: "auto" });
 if (window.location.hash) {
   history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
 }
@@ -53,6 +53,56 @@ let volunteerStoryMetrics = null;
 let viewportWidth = 0;
 let heroTransitionComplete = false;
 const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+const gsapRuntime = window.gsap;
+const scrollTriggerRuntime = window.ScrollTrigger;
+let smoothScroller = null;
+
+if (gsapRuntime && scrollTriggerRuntime) {
+  gsapRuntime.registerPlugin(scrollTriggerRuntime);
+}
+
+if (window.Lenis && !reducedMotionQuery.matches) {
+  smoothScroller = new window.Lenis({
+    duration: 1,
+    easing: (time) => Math.min(1, 1.001 - Math.pow(2, -10 * time)),
+    smoothWheel: true,
+    syncTouch: false,
+    wheelMultiplier: 1,
+    touchMultiplier: 1,
+    anchors: true,
+    allowNestedScroll: true,
+    overscroll: true,
+    autoResize: true,
+  });
+  window.siteLenis = smoothScroller;
+
+  if (gsapRuntime && scrollTriggerRuntime) {
+    smoothScroller.on("scroll", scrollTriggerRuntime.update);
+    gsapRuntime.ticker.add((time) => smoothScroller.raf(time * 1000));
+    gsapRuntime.ticker.lagSmoothing(0);
+  } else {
+    const updateSmoothScroll = (time) => {
+      smoothScroller.raf(time);
+      requestAnimationFrame(updateSmoothScroll);
+    };
+    requestAnimationFrame(updateSmoothScroll);
+  }
+}
+
+const returnToFirstSection = () => {
+  resetInitialScroll();
+  smoothScroller?.scrollTo(0, { immediate: true, force: true });
+};
+
+returnToFirstSection();
+window.addEventListener("pageshow", () => {
+  returnToFirstSection();
+  requestAnimationFrame(() => {
+    returnToFirstSection();
+    requestAnimationFrame(returnToFirstSection);
+  });
+});
+
 const heroMarqueeStates = Array.from(document.querySelectorAll(".hero-marquee")).map((row) => ({
   row,
   group: row.querySelector(".hero-marquee-group"),
@@ -177,6 +227,7 @@ const detailImage = detailView?.querySelector(".detail-media img");
 const detailLabel = detailView?.querySelector(".detail-label");
 const detailTitle = detailView?.querySelector(".detail-copy h2");
 const detailCopy = detailView?.querySelector(".detail-copy p");
+const detailLink = detailView?.querySelector(".detail-link");
 const highlightBlocks = document.querySelectorAll(".text-highlight");
 let currentStorySlide = null;
 let highlightResizeTimer = null;
@@ -1271,6 +1322,33 @@ if (projectStack && layerCards.length && projectSnapDots) {
   configureMobileProjects();
 }
 
+const resetProjectInteractionState = () => {
+  if (!projectStack || !layerCards.length) return;
+
+  pendingLayerPointer = null;
+  if (layerHoverFrame) cancelAnimationFrame(layerHoverFrame);
+  layerHoverFrame = 0;
+  layerCards.forEach((card) => delete card.dataset.tapStartedActive);
+
+  if (isMobileProjectMode()) {
+    window.clearTimeout(mobileProjectSettleTimer);
+    mobileProjectSettleTimer = 0;
+    projectStack.classList.remove("mobile-project-scrolling");
+    if (mobileProjectVisualFrame) cancelAnimationFrame(mobileProjectVisualFrame);
+    mobileProjectVisualFrame = 0;
+    updateMobileProjectVisuals();
+    return;
+  }
+
+  if (layerMotionFrame) cancelAnimationFrame(layerMotionFrame);
+  layerMotionFrame = 0;
+  layerMotionTime = 0;
+  setActiveLayer(2, { lift: false });
+};
+
+window.addEventListener("blur", resetProjectInteractionState);
+document.addEventListener("visibilitychange", resetProjectInteractionState);
+
 let lastDetailTrigger = null;
 
 const openDetail = (card) => {
@@ -1288,9 +1366,21 @@ const openDetail = (card) => {
     detailTitle.textContent = card.dataset.detailTitle || "";
   }
   detailCopy.textContent = card.dataset.detailCopy || "";
+  if (detailLink) {
+    const link = card.dataset.detailLink || "";
+    detailLink.hidden = !link;
+    if (link) {
+      detailLink.href = link;
+      detailLink.textContent = card.dataset.detailLinkLabel || "View project";
+    } else {
+      detailLink.removeAttribute("href");
+      detailLink.textContent = "";
+    }
+  }
   detailView.classList.add("open");
   detailView.setAttribute("aria-hidden", "false");
   document.body.classList.add("detail-open");
+  smoothScroller?.stop();
   requestAnimationFrame(() => detailClose?.focus());
 };
 
@@ -1301,6 +1391,7 @@ const closeDetail = () => {
   detailView.classList.remove("marihacks-detail", "optimath-detail", "speedcube-detail");
   detailView.setAttribute("aria-hidden", "true");
   document.body.classList.remove("detail-open");
+  smoothScroller?.start();
   lastDetailTrigger?.focus();
 };
 
@@ -1381,8 +1472,222 @@ document.fonts?.ready.then(() => {
   updateStoryMetrics();
   updateVolunteerStoryMetrics();
   updateVolunteerStory();
+  scrollTriggerRuntime?.refresh();
 });
 updateScroll();
+
+const initializeScrollEntrances = () => {
+  if (!gsapRuntime || !scrollTriggerRuntime) return;
+
+  const slides = Array.from(storySlides);
+  const resultItems = Array.from(document.querySelectorAll(".result-item"));
+  const socialLinks = Array.from(document.querySelectorAll(".footer-socials a"));
+  const footerEmail = document.querySelector(".footer-email");
+  const footer = document.querySelector(".site-footer");
+
+  slides.forEach((slide) => slide.classList.add("visible"));
+  resultItems.forEach((item) => item.classList.add("visible"));
+
+  if (reducedMotionQuery.matches) {
+    gsapRuntime.set([
+      ...slides.map((slide) => slide.querySelector(".story-window")),
+      ...slides.map((slide) => slide.querySelector(".story-text")),
+      ...resultItems,
+      ...socialLinks,
+      footerEmail,
+    ].filter(Boolean), { clearProps: "all" });
+    return;
+  }
+
+  const addUnfoldingRow = (timeline, targets, position) => {
+    timeline
+      .set(targets, { autoAlpha: 1 }, position)
+      .to(targets, {
+        clipPath: "inset(0% 0% 0% 0%)",
+        duration: 0.82,
+        ease: "power3.inOut",
+      }, position);
+  };
+
+  const motionMedia = gsapRuntime.matchMedia();
+
+  motionMedia.add("(min-width: 861px)", () => {
+    const firstRow = slides.slice(0, 3).map((slide) => slide.querySelector(".story-window"));
+    const secondRow = slides.slice(3).map((slide) => slide.querySelector(".story-window"));
+    const descriptions = slides.map((slide) => slide.querySelector(".story-text"));
+    const allWindows = [...firstRow, ...secondRow];
+
+    gsapRuntime.set(allWindows, {
+      autoAlpha: 0,
+      clipPath: "inset(0% 0% 91% 0%)",
+      force3D: true,
+      transformOrigin: "50% 0%",
+      willChange: "clip-path",
+    });
+    gsapRuntime.set(descriptions, { autoAlpha: 0, y: 24, force3D: true });
+
+    const timeline = gsapRuntime.timeline({
+      defaults: { overwrite: "auto" },
+      scrollTrigger: {
+        trigger: storyTrack,
+        start: "top 78%",
+        once: true,
+      },
+    });
+
+    addUnfoldingRow(timeline, firstRow, 0);
+    addUnfoldingRow(timeline, secondRow, ">");
+    timeline
+      .to(descriptions, {
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.52,
+        stagger: 0.065,
+        ease: "power3.out",
+      }, ">-0.02")
+      .set([...allWindows, ...descriptions], { clearProps: "clipPath,transform,transformOrigin,opacity,visibility,willChange" });
+
+    return () => timeline.kill();
+  });
+
+  motionMedia.add("(max-width: 860px)", () => {
+    const animations = slides.map((slide) => {
+      const windowElement = slide.querySelector(".story-window");
+      const description = slide.querySelector(".story-text");
+      const timeline = gsapRuntime.timeline({
+        scrollTrigger: {
+          trigger: slide,
+          start: "top 84%",
+          once: true,
+        },
+      });
+
+      timeline
+        .fromTo(windowElement, {
+          autoAlpha: 0,
+          clipPath: "inset(0% 0% 91% 0%)",
+          transformOrigin: "50% 0%",
+          willChange: "clip-path",
+        }, {
+          autoAlpha: 1,
+          clipPath: "inset(0% 0% 0% 0%)",
+          duration: 0.82,
+          ease: "power3.inOut",
+        })
+        .fromTo(description, {
+          autoAlpha: 0,
+          y: 18,
+        }, {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.42,
+          ease: "power3.out",
+        }, ">-0.04")
+        .set([windowElement, description], { clearProps: "clipPath,transform,transformOrigin,opacity,visibility,willChange" });
+
+      return timeline;
+    });
+
+    return () => animations.forEach((animation) => animation.kill());
+  });
+
+  resultItems.forEach((item) => {
+    gsapRuntime.fromTo(item, {
+      autoAlpha: 0,
+      y: 30,
+    }, {
+      autoAlpha: 1,
+      y: 0,
+      duration: 0.72,
+      ease: "power3.out",
+      clearProps: "transform,opacity,visibility",
+      scrollTrigger: {
+        trigger: item,
+        start: "top 88%",
+        once: true,
+      },
+    });
+  });
+
+  if (footer && socialLinks.length >= 2 && footerEmail) {
+    const [githubLink, linkedInLink] = socialLinks;
+    const travel = () => Math.min(window.innerWidth * 0.42, 560);
+    const collisionGithub = () => (22 + linkedInLink.offsetWidth) / 2;
+    const collisionLinkedIn = () => -(22 + githubLink.offsetWidth) / 2;
+    gsapRuntime.set(footerEmail, { autoAlpha: 0, y: 28 });
+    const footerTimeline = gsapRuntime.timeline({
+      scrollTrigger: {
+        trigger: footer,
+        start: "top 96%",
+        once: true,
+        invalidateOnRefresh: true,
+      },
+    });
+
+    footerTimeline
+      .fromTo(githubLink, {
+        autoAlpha: 0,
+        x: () => -travel(),
+        rotation: -6,
+      }, {
+        autoAlpha: 1,
+        x: collisionGithub,
+        rotation: 2,
+        duration: 0.72,
+        ease: "power3.in",
+      }, 0)
+      .fromTo(linkedInLink, {
+        autoAlpha: 0,
+        x: travel,
+        rotation: 6,
+      }, {
+        autoAlpha: 1,
+        x: collisionLinkedIn,
+        rotation: -2,
+        duration: 0.72,
+        ease: "power3.in",
+      }, 0)
+      .to([githubLink, linkedInLink], {
+        scaleX: 1.18,
+        scaleY: 0.8,
+        duration: 0.09,
+        ease: "power2.out",
+      }, ">")
+      .to([githubLink, linkedInLink], {
+        scaleX: 0.94,
+        scaleY: 1.12,
+        duration: 0.11,
+        ease: "power2.out",
+      }, ">")
+      .to(githubLink, {
+        x: 0,
+        rotation: 0,
+        scaleX: 1,
+        scaleY: 1,
+        duration: 0.68,
+        ease: "elastic.out(1, 0.55)",
+      }, ">")
+      .to(linkedInLink, {
+        x: 0,
+        rotation: 0,
+        scaleX: 1,
+        scaleY: 1,
+        duration: 0.68,
+        ease: "elastic.out(1, 0.55)",
+      }, "<")
+      .to(footerEmail, {
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.48,
+        ease: "power3.out",
+      }, "<0.08")
+      .set([githubLink, linkedInLink, footerEmail], { clearProps: "transform,opacity,visibility" });
+  }
+
+  scrollTriggerRuntime.refresh();
+};
+
+initializeScrollEntrances();
 
 let activeStoryWindow = null;
 const lensRadius = 112;
