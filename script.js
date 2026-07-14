@@ -19,6 +19,8 @@ const themeSections = document.querySelectorAll("main > section, .curtain-sequen
 let activeThemeSection = themeSections[0] || null;
 const hero = document.querySelector(".hero");
 const heroStage = document.querySelector(".hero-stage");
+const achievementsSection = document.querySelector("#achievements");
+const chessSeparatorPath = achievementsSection?.querySelector(".chess-separator path");
 const projectsSection = document.querySelector("#projects");
 const contactSection = document.querySelector("#contact");
 const volunteerStory = document.querySelector("[data-volunteer-story]");
@@ -262,6 +264,23 @@ const updateCurtainState = () => {
   document.body.classList.toggle("curtain-in-progress", isActive);
 };
 
+const updateChessSeparatorCurve = () => {
+  if (!achievementsSection || !chessSeparatorPath) return;
+  const rect = achievementsSection.getBoundingClientRect();
+  const travel = Math.max(1, window.innerHeight * 0.68);
+  const rawProgress = Math.min(1, Math.max(0, (window.innerHeight - rect.top) / travel));
+  const progress = reducedMotionQuery.matches
+    ? (rawProgress > 0 ? 1 : 0)
+    : rawProgress * rawProgress * (3 - 2 * rawProgress);
+  const edge = 4;
+  const depth = edge + progress * 32;
+  const control = edge + (depth - edge) * 2;
+  chessSeparatorPath.setAttribute(
+    "d",
+    `M0 0H100V${edge}Q50 ${control.toFixed(2)} 0 ${edge}Z`
+  );
+};
+
 const updateChapterTravel = () => {
   const viewportWidth = document.documentElement.clientWidth;
   const isMobile = viewportWidth < 700;
@@ -405,6 +424,7 @@ const updateScroll = () => {
     document.documentElement.style.setProperty("--jcs-exit-y", `${exitY.toFixed(2)}px`);
   }
   updateHeroTransition();
+  updateChessSeparatorCurve();
   updateCurtainState();
   updateChapterProgress();
   updateTimelineProgress();
@@ -639,7 +659,7 @@ const sectionTheme = (section) => {
   if (section.classList.contains("closing")) return "final";
   if (section.classList.contains("signature-section")) return "dark";
   if (section.classList.contains("profile")) return "light";
-  if (section.classList.contains("achievements")) return "dark";
+  if (section.classList.contains("achievements")) return "light";
   if (section.classList.contains("projects")) return "dark";
   return "light";
 };
@@ -993,7 +1013,7 @@ const setActiveLayer = (index, { lift = true } = {}) => {
   const desktopInteraction = !coarsePointer && !isMobileProjectMode();
   const fanScales = getLayerFanScales();
   const fanRotations = getLayerFanRotations();
-  const activeScale = desktopInteraction ? 1.075 : 1.01;
+  const activeScale = desktopInteraction ? (lift ? 1.075 : 1) : 1.01;
   const desktopPush = Math.min(78, Math.max(56, window.innerWidth * 0.055));
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -1016,13 +1036,15 @@ const setActiveLayer = (index, { lift = true } = {}) => {
       ? (isActive ? -baseRotation * 0.1 : direction * (1.15 / Math.max(1, distance)))
       : (isActive ? 0 : direction * Math.min(0.8, 0.32 + distance * 0.12));
     state.layoutX = nudge;
-    state.layoutY = isActive && lift
-      ? (desktopInteraction ? -18 : -4)
-      : (desktopInteraction && distance === 1 ? 3 : 0);
-    state.layoutScale = isActive
-      ? activeScale - fanScales[cardIndex]
-      : (desktopInteraction ? -Math.max(0, 0.01 - distance * 0.002) : 0);
-    state.layoutRotation = outwardRotation;
+    state.layoutY = lift
+      ? (isActive ? (desktopInteraction ? -18 : -4) : (desktopInteraction && distance === 1 ? 3 : 0))
+      : 0;
+    state.layoutScale = lift
+      ? (isActive
+        ? activeScale - fanScales[cardIndex]
+        : (desktopInteraction ? -Math.max(0, 0.01 - distance * 0.002) : 0))
+      : 0;
+    state.layoutRotation = lift ? outwardRotation : 0;
     state.response = isActive ? 1.05 : Math.max(0.68, 0.92 - distance * 0.07);
     state.targetX = state.layoutX;
     state.targetY = state.layoutY;
@@ -1499,14 +1521,12 @@ const initializeScrollEntrances = () => {
     return;
   }
 
-  const addUnfoldingRow = (timeline, targets, position) => {
-    timeline
-      .set(targets, { autoAlpha: 1 }, position)
-      .to(targets, {
-        clipPath: "inset(0% 0% 0% 0%)",
-        duration: 0.82,
-        ease: "power3.inOut",
-      }, position);
+  const addFadingRow = (timeline, targets, position) => {
+    timeline.to(targets, {
+      autoAlpha: 1,
+      duration: 0.58,
+      ease: "power2.out",
+    }, position);
   };
 
   const motionMedia = gsapRuntime.matchMedia();
@@ -1519,12 +1539,10 @@ const initializeScrollEntrances = () => {
 
     gsapRuntime.set(allWindows, {
       autoAlpha: 0,
-      clipPath: "inset(0% 0% 91% 0%)",
       force3D: true,
-      transformOrigin: "50% 0%",
-      willChange: "clip-path",
+      willChange: "opacity",
     });
-    gsapRuntime.set(descriptions, { autoAlpha: 0, y: 24, force3D: true });
+    gsapRuntime.set(descriptions, { autoAlpha: 0, force3D: true, willChange: "opacity" });
 
     const timeline = gsapRuntime.timeline({
       defaults: { overwrite: "auto" },
@@ -1535,17 +1553,15 @@ const initializeScrollEntrances = () => {
       },
     });
 
-    addUnfoldingRow(timeline, firstRow, 0);
-    addUnfoldingRow(timeline, secondRow, ">");
+    addFadingRow(timeline, firstRow, 0);
+    addFadingRow(timeline, secondRow, ">");
     timeline
       .to(descriptions, {
         autoAlpha: 1,
-        y: 0,
-        duration: 0.52,
-        stagger: 0.065,
-        ease: "power3.out",
-      }, ">-0.02")
-      .set([...allWindows, ...descriptions], { clearProps: "clipPath,transform,transformOrigin,opacity,visibility,willChange" });
+        duration: 0.5,
+        ease: "power2.out",
+      }, ">")
+      .set([...allWindows, ...descriptions], { clearProps: "transform,opacity,visibility,willChange" });
 
     return () => timeline.kill();
   });
@@ -1565,25 +1581,21 @@ const initializeScrollEntrances = () => {
       timeline
         .fromTo(windowElement, {
           autoAlpha: 0,
-          clipPath: "inset(0% 0% 91% 0%)",
-          transformOrigin: "50% 0%",
-          willChange: "clip-path",
+          willChange: "opacity",
         }, {
           autoAlpha: 1,
-          clipPath: "inset(0% 0% 0% 0%)",
-          duration: 0.82,
-          ease: "power3.inOut",
+          duration: 0.58,
+          ease: "power2.out",
         })
         .fromTo(description, {
           autoAlpha: 0,
-          y: 18,
+          willChange: "opacity",
         }, {
           autoAlpha: 1,
-          y: 0,
-          duration: 0.42,
-          ease: "power3.out",
-        }, ">-0.04")
-        .set([windowElement, description], { clearProps: "clipPath,transform,transformOrigin,opacity,visibility,willChange" });
+          duration: 0.46,
+          ease: "power2.out",
+        }, ">")
+        .set([windowElement, description], { clearProps: "transform,opacity,visibility,willChange" });
 
       return timeline;
     });
@@ -1970,6 +1982,34 @@ if (window.matchMedia("(pointer: fine)").matches) {
 }
 
 const storyTapMode = window.matchMedia("(max-width: 860px), (hover: none), (pointer: coarse)");
+const storyHoverMode = window.matchMedia("(min-width: 861px) and (hover: hover) and (pointer: fine)");
+const storyHoverTimers = new WeakMap();
+
+const setStoryWindowHovered = (windowEl, hovered) => {
+  const activeTimer = storyHoverTimers.get(windowEl);
+  if (activeTimer) window.clearTimeout(activeTimer);
+
+  if (hovered) {
+    storyHoverTimers.delete(windowEl);
+    windowEl.classList.add("is-hovered");
+    return;
+  }
+
+  const timer = window.setTimeout(() => {
+    windowEl.classList.remove("is-hovered");
+    storyHoverTimers.delete(windowEl);
+  }, 120);
+  storyHoverTimers.set(windowEl, timer);
+};
+
+const clearStoryHoverStates = () => {
+  storyWindows.forEach((windowEl) => {
+    const activeTimer = storyHoverTimers.get(windowEl);
+    if (activeTimer) window.clearTimeout(activeTimer);
+    storyHoverTimers.delete(windowEl);
+    windowEl.classList.remove("is-hovered");
+  });
+};
 
 const setStoryWindowRevealed = (windowEl, revealed) => {
   windowEl.classList.toggle("revealing", revealed);
@@ -1981,13 +2021,21 @@ storyWindows.forEach((windowEl) => {
   windowEl.setAttribute("tabindex", "0");
   windowEl.setAttribute("aria-pressed", "false");
 
+  windowEl.addEventListener("pointerenter", () => {
+    if (storyHoverMode.matches) setStoryWindowHovered(windowEl, true);
+  });
+
+  windowEl.addEventListener("pointerleave", () => {
+    if (storyHoverMode.matches) setStoryWindowHovered(windowEl, false);
+  });
+
   const toggleWindow = () => {
     const nextState = !windowEl.classList.contains("revealing");
     setStoryWindowRevealed(windowEl, nextState);
   };
 
-  windowEl.addEventListener("click", () => {
-    if (storyTapMode.matches) toggleWindow();
+  windowEl.addEventListener("click", (event) => {
+    if (storyTapMode.matches && event.detail !== 0) toggleWindow();
   });
 
   windowEl.addEventListener("keydown", (event) => {
@@ -1999,4 +2047,10 @@ storyWindows.forEach((windowEl) => {
 
 storyTapMode.addEventListener?.("change", () => {
   storyWindows.forEach((windowEl) => setStoryWindowRevealed(windowEl, false));
+});
+
+storyHoverMode.addEventListener?.("change", clearStoryHoverStates);
+window.addEventListener("blur", clearStoryHoverStates);
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) clearStoryHoverStates();
 });

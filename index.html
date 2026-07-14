@@ -28,6 +28,16 @@
     <link rel="stylesheet" href="assets/vendor/lenis.css" />
   </head>
   <body>
+    <svg class="svg-definitions" width="0" height="0" aria-hidden="true">
+      <defs>
+        <clipPath id="chess-cover-shape" clipPathUnits="objectBoundingBox">
+          <path d="M .024 .015 H .976 Q .99 .015 .99 .032 V .86 Q .99 .89 .967 .89 H .73 C .62 .89 .62 .92 .59 .94 C .56 .97 .55 .99 .52 .99 H .03 Q .01 .99 .01 .97 V .032 Q .01 .015 .024 .015 Z"></path>
+        </clipPath>
+        <clipPath id="chess-cover-shape-mobile" clipPathUnits="objectBoundingBox">
+          <path d="M .024 .015 H .976 Q .99 .015 .99 .032 V .84 Q .99 .87 .967 .87 H .7 C .58 .87 .58 .92 .54 .94 C .51 .97 .49 .99 .46 .99 H .03 Q .01 .99 .01 .97 V .032 Q .01 .015 .024 .015 Z"></path>
+        </clipPath>
+      </defs>
+    </svg>
     <div class="noise" aria-hidden="true"></div>
     <div class="scroll-meter" aria-hidden="true"><span></span></div>
     <div class="hero-monogram" aria-hidden="true">
@@ -84,6 +94,9 @@
       </section>
 
       <section id="achievements" class="achievements">
+        <svg class="chess-separator" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0 0H100V4Q50 4 0 4Z"></path>
+        </svg>
         <div class="section-heading reveal">
           <p class="eyebrow">Chess</p>
           <h2 class="text-highlight chess-heading-highlight" data-highlight-base="0">Competition results and major tournaments.</h2>
@@ -92,16 +105,20 @@
         <div class="scroll-story" aria-label="Chess achievements grid">
           <div class="story-track">
             <article class="story-slide reveal active">
-              <div class="story-window" style="--pos: 58% 50%">
+              <div class="story-window" style="--pos: 50% 50%">
                 <img src="assets/chess-rapid-2025-1st.jpg" alt="Championnat jeunesse du Québec rapid chess 2025 podium" />
                 <div class="cover-clip">
                   <div class="cover-layer">
-                    <span class="cover-knight" aria-hidden="true">♞</span>
-                    <div class="story-caption">
-                      <span class="story-kicker">Rapid</span>
-                      <h3 class="story-title">2025 · 1st</h3>
-                    </div>
+                    <span class="cover-knight" aria-hidden="true"></span>
                   </div>
+                </div>
+                <svg class="cover-frame" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                  <path class="cover-frame-path cover-frame-path-desktop" d="M2.4 1.5H97.6Q99 1.5 99 3.2V86Q99 89 96.7 89H73C62 89 62 92 59 94C56 97 55 99 52 99H3Q1 99 1 97V3.2Q1 1.5 2.4 1.5Z"></path>
+                  <path class="cover-frame-path cover-frame-path-mobile" d="M2.4 1.5H97.6Q99 1.5 99 3.2V84Q99 87 96.7 87H70C58 87 58 92 54 94C51 97 49 99 46 99H3Q1 99 1 97V3.2Q1 1.5 2.4 1.5Z"></path>
+                </svg>
+                <div class="story-caption">
+                  <span class="story-kicker">Rapid</span>
+                  <h3 class="story-title">2025 · 1st</h3>
                 </div>
               </div>
               <div class="story-text">
@@ -115,12 +132,16 @@
                 <img src="assets/team-quebec-ontario-2025-1st.jpg" alt="Quebec vs Ontario team tournament 2025 winners" />
                 <div class="cover-clip">
                   <div class="cover-layer">
-                    <span class="cover-knight" aria-hidden="true">♞</span>
-                    <div class="story-caption">
-                      <span class="story-kicker">Team</span>
-                      <h3 class="story-title">2025 · 1st</h3>
-                    </div>
+                    <span class="cover-knight" aria-hidden="true"></span>
                   </div>
+                </div>
+                <svg class="cover-frame" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                  <path class="cover-frame-path cover-frame-path-desktop" d="M2.4 1.5H97.6Q99 1.5 99 3.2V86Q99 89 96.7 89H73C62 89 62 92 59 94C56 97 55 99 52 99H3Q1 99 1 97V3.2Q1 1.5 2.4 1.5Z"></path>
+                  <path class="cover-frame-path cover-frame-path-mobile" d="M2.4 1.5H97.6Q99 1.5 99 3.2V84Q99 87 96.7 87H70C58 87 58 92 54 94C51 97 49 99 46 99H3Q1 99 1 97V3.2Q1 1.5 2.4 1.5Z"></path>
+                </svg>
+                <div class="story-caption">
+                  <span class="story-kicker">Team</span>
+                  <h3 class="story-title">2025 · 1st</h3>
                 </div>
               </div>
               <div class="story-text">
@@ -130,16 +151,20 @@
             </article>
 
             <article class="story-slide reveal">
-              <div class="story-window" style="--pos: 67% 50%">
+              <div class="story-window" style="--pos: 50% 50%">
                 <img src="assets/chess-rapid-2024-3rd.jpg" alt="Championnat jeunesse du Québec rapid chess 2024 podium" />
                 <div class="cover-clip">
                   <div class="cover-layer">
-                    <span class="cover-knight" aria-hidden="true">♞</span>
-                    <div class="story-caption">
-                      <span class="story-kicker">Rapid</span>
-                      <h3 class="story-title">2024 · 3rd</h3>
-                    </div>
+                    <span class="cover-knight" aria-hidden="true"></span>
                   </div>
+                </div>
+                <svg class="cover-frame" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                  <path class="cover-frame-path cover-frame-path-desktop" d="M2.4 1.5H97.6Q99 1.5 99 3.2V86Q99 89 96.7 89H73C62 89 62 92 59 94C56 97 55 99 52 99H3Q1 99 1 97V3.2Q1 1.5 2.4 1.5Z"></path>
+                  <path class="cover-frame-path cover-frame-path-mobile" d="M2.4 1.5H97.6Q99 1.5 99 3.2V84Q99 87 96.7 87H70C58 87 58 92 54 94C51 97 49 99 46 99H3Q1 99 1 97V3.2Q1 1.5 2.4 1.5Z"></path>
+                </svg>
+                <div class="story-caption">
+                  <span class="story-kicker">Rapid</span>
+                  <h3 class="story-title">2024 · 3rd</h3>
                 </div>
               </div>
               <div class="story-text">
@@ -153,12 +178,16 @@
                 <img src="assets/cycc-2025.jpg" alt="Canadian Youth Chess Championship tournament room" />
                 <div class="cover-clip">
                   <div class="cover-layer">
-                    <span class="cover-knight" aria-hidden="true">♞</span>
-                    <div class="story-caption">
-                      <span class="story-kicker">CYCC</span>
-                      <h3 class="story-title">2024–25</h3>
-                    </div>
+                    <span class="cover-knight" aria-hidden="true"></span>
                   </div>
+                </div>
+                <svg class="cover-frame" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                  <path class="cover-frame-path cover-frame-path-desktop" d="M2.4 1.5H97.6Q99 1.5 99 3.2V86Q99 89 96.7 89H73C62 89 62 92 59 94C56 97 55 99 52 99H3Q1 99 1 97V3.2Q1 1.5 2.4 1.5Z"></path>
+                  <path class="cover-frame-path cover-frame-path-mobile" d="M2.4 1.5H97.6Q99 1.5 99 3.2V84Q99 87 96.7 87H70C58 87 58 92 54 94C51 97 49 99 46 99H3Q1 99 1 97V3.2Q1 1.5 2.4 1.5Z"></path>
+                </svg>
+                <div class="story-caption">
+                  <span class="story-kicker">CYCC</span>
+                  <h3 class="story-title">2024–25</h3>
                 </div>
               </div>
               <div class="story-text">
@@ -172,12 +201,16 @@
                 <img src="assets/naycc-2025.jpg" alt="North American Youth Chess Championship 2025 in Kingston" />
                 <div class="cover-clip">
                   <div class="cover-layer">
-                    <span class="cover-knight" aria-hidden="true">♞</span>
-                    <div class="story-caption">
-                      <span class="story-kicker">NAYCC</span>
-                      <h3 class="story-title">2025</h3>
-                    </div>
+                    <span class="cover-knight" aria-hidden="true"></span>
                   </div>
+                </div>
+                <svg class="cover-frame" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                  <path class="cover-frame-path cover-frame-path-desktop" d="M2.4 1.5H97.6Q99 1.5 99 3.2V86Q99 89 96.7 89H73C62 89 62 92 59 94C56 97 55 99 52 99H3Q1 99 1 97V3.2Q1 1.5 2.4 1.5Z"></path>
+                  <path class="cover-frame-path cover-frame-path-mobile" d="M2.4 1.5H97.6Q99 1.5 99 3.2V84Q99 87 96.7 87H70C58 87 58 92 54 94C51 97 49 99 46 99H3Q1 99 1 97V3.2Q1 1.5 2.4 1.5Z"></path>
+                </svg>
+                <div class="story-caption">
+                  <span class="story-kicker">NAYCC</span>
+                  <h3 class="story-title">2025</h3>
                 </div>
               </div>
               <div class="story-text">

@@ -851,12 +851,18 @@ body.theme-final .skill-group:hover {
 }
 
 .achievements {
+  --ink: #202328;
+  --ink-rgb: 32, 35, 40;
+  --muted: #202328;
+  --line: rgba(32, 35, 40, 0.16);
+  --accent-text: #202328;
   position: relative;
   padding: 88px 0 110px;
   border-top: 0;
   overflow-x: visible;
   isolation: isolate;
-  background: #25272c;
+  color: var(--ink);
+  background: #f4f4f4;
 }
 
 .achievements::after {
@@ -867,8 +873,32 @@ body.theme-final .skill-group:hover {
   left: 50%;
   width: 100vw;
   z-index: -1;
-  background: #25272c;
+  background: #f4f4f4;
   transform: translateX(-50%);
+}
+
+.chess-separator {
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  z-index: 0;
+  display: block;
+  width: 100vw;
+  height: clamp(72px, 8vw, 120px);
+  overflow: visible;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.chess-separator path {
+  fill: #25272c;
+}
+
+.achievements > .section-heading,
+.achievements > .scroll-story,
+.achievements > .result-strip {
+  position: relative;
+  z-index: 1;
 }
 
 .achievements .section-heading {
@@ -881,8 +911,12 @@ body.theme-final .skill-group:hover {
   line-height: 0.94;
 }
 
+.achievements .section-heading .eyebrow {
+  color: #467a6e;
+}
+
 .achievements .chess-heading-highlight {
-  --highlight-ink: #f3f7ea;
+  --highlight-ink: #202328;
   --highlight-block: #b8f7e4;
 }
 
@@ -1029,6 +1063,15 @@ body.theme-final .skill-group:hover {
   filter: none;
   transform: translate(-50%, -50%);
   pointer-events: none;
+}
+
+.story-window:focus {
+  outline: none;
+}
+
+.story-window:focus-visible {
+  outline: 2px solid #467a6e;
+  outline-offset: 3px;
 }
 
 .cover-knight-silhouette {
@@ -1203,23 +1246,27 @@ body.theme-final .skill-group:hover {
 
 .result-item span {
   display: block;
-  color: var(--lime);
+  color: var(--accent-text);
   font-size: clamp(2.5rem, 6vw, 5.8rem);
   font-weight: 900;
   line-height: 0.82;
   text-transform: uppercase;
 }
 
+.achievements .result-item > span {
+  color: #467a6e;
+}
+
 .result-item h3 {
   margin: 8px 0 10px;
-  color: #f7f3ea;
+  color: var(--ink);
   font-size: clamp(1.45rem, 2.6vw, 2.55rem);
   line-height: 1;
 }
 
 .result-item p {
   margin: 0;
-  color: var(--lime);
+  color: var(--accent-text);
   font-size: 0.76rem;
   font-weight: 900;
   text-transform: uppercase;
@@ -1228,7 +1275,7 @@ body.theme-final .skill-group:hover {
 .result-item strong {
   display: block;
   margin-bottom: 0;
-  color: #c1cbb7;
+  color: var(--muted);
   font-size: clamp(1rem, 1.4vw, 1.22rem);
   font-weight: 700;
 }
@@ -2900,10 +2947,10 @@ body.theme-dark .education-mark {
 
 @keyframes highlightTextReveal {
   0%,
-  54% {
+  48% {
     clip-path: inset(0 100% 0 0);
   }
-  58%,
+  98%,
   100% {
     clip-path: inset(0 0 0 0);
   }
@@ -2913,14 +2960,22 @@ body.theme-dark .education-mark {
   0% {
     left: 0;
     width: 0;
+    opacity: 1;
   }
-  52% {
+  48% {
     left: 0;
     width: 100%;
+    opacity: 1;
+  }
+  98% {
+    left: 100%;
+    width: 0;
+    opacity: 1;
   }
   100% {
     left: 100%;
     width: 0;
+    opacity: 0;
   }
 }
 
@@ -3540,6 +3595,7 @@ body.curtain-in-progress .hero-monogram span[data-jcs-letter="s"] {
 }
 
 #contact.closing {
+  --page-final: #f4f4f4;
   --ink: #202328;
   --ink-rgb: 32, 35, 40;
   --muted: #5d6872;
@@ -3695,7 +3751,7 @@ body.curtain-in-progress .hero-monogram span[data-jcs-letter="s"] {
 }
 
 .projects .project-stack.layers-unfolded:not(.layers-physics) .layer-card.is-layer-active {
-  --layer-scale: 1.01;
+  --layer-scale: var(--fan-scale);
 }
 
 .projects .project-stack.layers-physics .layer-card {
@@ -4250,20 +4306,223 @@ body.hero-zoomed .hero-monogram span,
   -webkit-mask-size: 100% 100%;
   mask-size: 100% 100%;
   transition:
-    transform 680ms cubic-bezier(0.22, 0.68, 0.24, 1),
-    --curtain-depth 260ms linear;
+    transform 500ms cubic-bezier(0.22, 0.68, 0.24, 1),
+    --curtain-depth 190ms linear;
 }
 
 .story-window.revealing .cover-layer {
   --curtain-depth: 8.5%;
   transform: translate3d(0, 101%, 0);
-  transition-delay: 90ms, 110ms;
+  transition-delay: 35ms, 55ms;
 }
 
 @media (min-width: 861px) and (hover: hover) and (pointer: fine) {
-  .story-window:hover .cover-layer {
+  .story-window:hover .cover-layer,
+  .story-window.is-hovered .cover-layer {
     --curtain-depth: 8.5%;
     transform: translate3d(0, 101%, 0);
-    transition-delay: 90ms, 110ms;
+    transition-duration: 500ms, 190ms;
+    transition-timing-function: cubic-bezier(0.22, 0.68, 0.24, 1), linear;
+    transition-delay: 35ms, 55ms;
+  }
+}
+
+.cover-clip {
+  border: 0;
+}
+
+.story-window::after {
+  content: "";
+  position: absolute;
+  inset: var(--cover-inset);
+  z-index: 20;
+  display: block;
+  border: 1px solid #79a49a;
+  pointer-events: none;
+}
+
+/* Reference-shaped chess covers: the caption sits outside the moving curtain. */
+.svg-definitions {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.story-slide {
+  --cover-inset: 0px;
+  --cover-accent: #b8f7e4;
+  --story-accent: #202328;
+}
+
+.story-window {
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 2px;
+  background: transparent;
+  box-shadow: none;
+  container-type: inline-size;
+}
+
+.story-window:focus {
+  outline: none;
+}
+
+.story-window:focus-visible {
+  outline: 2px solid var(--cover-accent);
+  outline-offset: 4px;
+}
+
+.story-window img,
+.cover-clip {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+  -webkit-clip-path: url("#chess-cover-shape");
+  clip-path: url("#chess-cover-shape");
+}
+
+.story-window img {
+  object-position: var(--pos, 50% 50%);
+}
+
+.cover-clip {
+  background: transparent;
+}
+
+.cover-layer {
+  background: var(--page-dark);
+}
+
+.cover-layer::before,
+.cover-layer::after {
+  content: none;
+}
+
+.cover-knight {
+  top: 55%;
+  z-index: 2;
+  width: 52%;
+  height: 62%;
+  background: #b8f7e4;
+  -webkit-mask: url("assets/chess-knight-solid-white.png") center / contain no-repeat;
+  mask: url("assets/chess-knight-solid-white.png") center / contain no-repeat;
+  color: transparent;
+  font-size: 0;
+  text-shadow: none;
+}
+
+.cover-frame {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.cover-frame path {
+  fill: none;
+  stroke: #55595b;
+  stroke-width: 1.15;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.cover-frame-path-mobile {
+  display: none;
+}
+
+.story-caption {
+  inset: auto 1.8cqi 1.8cqi auto;
+  z-index: 22;
+  width: 35%;
+  min-width: 0;
+  max-width: none;
+  gap: clamp(4px, 1.4cqi, 7px);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.story-caption::before {
+  content: none;
+}
+
+.story-kicker {
+  flex: 0 1 auto;
+  min-width: 0;
+  color: var(--story-accent);
+  font-size: clamp(0.64rem, 3cqi, 0.82rem);
+  letter-spacing: 0;
+}
+
+.story-title {
+  flex: 0 1 auto;
+  min-width: 0;
+  color: #467a6e;
+  font-size: clamp(0.9rem, 4.5cqi, 1.22rem);
+}
+
+.story-window::after {
+  content: none;
+}
+
+.story-text {
+  padding-inline: 2px;
+}
+
+.achievements .story-text h3 {
+  color: var(--story-accent);
+}
+
+@media (max-width: 860px) {
+  .story-window {
+    aspect-ratio: 1 / 1;
+    border-radius: 1px;
+  }
+
+  .story-caption {
+    inset: auto 1.8cqi 1.8cqi auto;
+    width: 43.5%;
+    gap: clamp(2px, 1.4cqi, 5px);
+    max-width: none;
+    padding: 0;
+  }
+
+  .story-kicker {
+    font-size: clamp(0.36rem, 3.8cqi, 0.76rem);
+  }
+
+  .story-title {
+    font-size: clamp(0.52rem, 5.4cqi, 1rem);
+  }
+
+  .story-window img,
+  .cover-clip {
+    -webkit-clip-path: url("#chess-cover-shape-mobile");
+    clip-path: url("#chess-cover-shape-mobile");
+  }
+
+  .cover-frame-path-desktop {
+    display: none;
+  }
+
+  .cover-frame-path-mobile {
+    display: block;
+  }
+
+  .cover-knight {
+    top: 55%;
+    width: 55%;
+    height: 64%;
   }
 }
