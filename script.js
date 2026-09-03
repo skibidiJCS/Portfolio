@@ -52,6 +52,7 @@ let timelineLastIndex = -1;
 let timelineVisible = false;
 let storyMetrics = null;
 let volunteerStoryMetrics = null;
+let volunteerLastProgress = -1;
 let viewportWidth = 0;
 let heroTransitionComplete = false;
 const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -61,34 +62,6 @@ let smoothScroller = null;
 
 if (gsapRuntime && scrollTriggerRuntime) {
   gsapRuntime.registerPlugin(scrollTriggerRuntime);
-}
-
-if (window.Lenis && !reducedMotionQuery.matches) {
-  smoothScroller = new window.Lenis({
-    duration: 1,
-    easing: (time) => Math.min(1, 1.001 - Math.pow(2, -10 * time)),
-    smoothWheel: true,
-    syncTouch: false,
-    wheelMultiplier: 1,
-    touchMultiplier: 1,
-    anchors: true,
-    allowNestedScroll: true,
-    overscroll: true,
-    autoResize: true,
-  });
-  window.siteLenis = smoothScroller;
-
-  if (gsapRuntime && scrollTriggerRuntime) {
-    smoothScroller.on("scroll", scrollTriggerRuntime.update);
-    gsapRuntime.ticker.add((time) => smoothScroller.raf(time * 1000));
-    gsapRuntime.ticker.lagSmoothing(0);
-  } else {
-    const updateSmoothScroll = (time) => {
-      smoothScroller.raf(time);
-      requestAnimationFrame(updateSmoothScroll);
-    };
-    requestAnimationFrame(updateSmoothScroll);
-  }
 }
 
 const returnToFirstSection = () => {
@@ -152,8 +125,11 @@ const signatureLengths = signaturePaths.map((path) => {
   path.style.visibility = "visible";
   return hiddenLength;
 });
+document.documentElement.classList.add("signature-ready");
 const signatureStrokeWeights = [0.08, 0.025, 0.235, 0.2, 0.2, 0.025, 0.235];
 let signatureLastProgress = -1;
+let signatureLastBackgroundProgress = -1;
+let signatureLastPhotoProgress = -1;
 
 const penStrokeProgress = (time) => {
   const progress = Math.min(1, Math.max(0, time));
@@ -173,38 +149,56 @@ const updateSignatureProgress = () => {
   const rawBackgroundProgress = (viewportHeight * 0.72 - sectionRect.top) / (viewportHeight * 0.34);
   const backgroundProgress = Math.min(1, Math.max(0, rawBackgroundProgress));
   const easedBackgroundProgress = backgroundProgress * backgroundProgress * (3 - 2 * backgroundProgress);
-  const lightColor = [226, 229, 216];
-  const darkColor = [36, 39, 30];
-  const blendedColor = lightColor.map((channel, index) =>
-    Math.round(channel + (darkColor[index] - channel) * easedBackgroundProgress)
-  );
-  document.documentElement.style.setProperty("--signature-bg-progress", easedBackgroundProgress.toFixed(4));
-  document.documentElement.style.setProperty("--signature-bg-color", `rgb(${blendedColor.join(", ")})`);
-  const blend = (from, to) => from.map((channel, index) =>
-    Math.round(channel + (to[index] - channel) * easedBackgroundProgress)
-  );
-  const timelineInk = blend([32, 37, 29], [243, 247, 234]);
-  const timelineMuted = blend([82, 96, 72], [193, 203, 183]);
-  const timelinePanel = blend([255, 255, 247], [49, 54, 42]);
-  const timelineBorder = blend([32, 37, 29], [243, 247, 234]);
-  const timelineShadow = blend([32, 37, 29], [0, 0, 0]);
-  document.documentElement.style.setProperty("--timeline-ink-color", `rgb(${timelineInk.join(", ")})`);
-  document.documentElement.style.setProperty("--timeline-muted-color", `rgb(${timelineMuted.join(", ")})`);
-  document.documentElement.style.setProperty("--timeline-panel-color", `rgba(${timelinePanel.join(", ")}, ${(0.54 + easedBackgroundProgress * 0.34).toFixed(3)})`);
-  document.documentElement.style.setProperty("--timeline-border-color", `rgba(${timelineBorder.join(", ")}, ${(0.13 + easedBackgroundProgress * 0.09).toFixed(3)})`);
-  document.documentElement.style.setProperty("--timeline-line-color", `rgba(${timelineBorder.join(", ")}, ${(0.15 + easedBackgroundProgress * 0.05).toFixed(3)})`);
-  document.documentElement.style.setProperty("--timeline-shadow-color", `rgba(${timelineShadow.join(", ")}, ${(0.11 + easedBackgroundProgress * 0.17).toFixed(3)})`);
-  const photoTop = sectionRect.top + signaturePaper.offsetTop;
-  const photoBottom = photoTop + signaturePaper.offsetHeight;
-  const photoProgress = Math.min(1, Math.max(0, (viewportHeight * 0.97 - photoTop) / (viewportHeight * 0.24)));
-  const signatureTravel = Math.max(1, viewportHeight * 0.22);
-  const rawSignatureProgress = Math.min(1, Math.max(0, (viewportHeight - 24 - photoBottom) / signatureTravel));
+  if (Math.abs(easedBackgroundProgress - signatureLastBackgroundProgress) >= 0.0005) {
+    signatureLastBackgroundProgress = easedBackgroundProgress;
+    const lightColor = [226, 229, 216];
+    const darkColor = [36, 39, 30];
+    const blendedColor = lightColor.map((channel, index) =>
+      Math.round(channel + (darkColor[index] - channel) * easedBackgroundProgress)
+    );
+    document.documentElement.style.setProperty("--signature-bg-progress", easedBackgroundProgress.toFixed(4));
+    document.documentElement.style.setProperty("--signature-bg-color", `rgb(${blendedColor.join(", ")})`);
+    const blend = (from, to) => from.map((channel, index) =>
+      Math.round(channel + (to[index] - channel) * easedBackgroundProgress)
+    );
+    const timelineInk = blend([32, 37, 29], [243, 247, 234]);
+    const timelineMuted = blend([82, 96, 72], [193, 203, 183]);
+    const timelinePanel = blend([255, 255, 247], [49, 54, 42]);
+    const timelineBorder = blend([32, 37, 29], [243, 247, 234]);
+    const timelineShadow = blend([32, 37, 29], [0, 0, 0]);
+    document.documentElement.style.setProperty("--timeline-ink-color", `rgb(${timelineInk.join(", ")})`);
+    document.documentElement.style.setProperty("--timeline-muted-color", `rgb(${timelineMuted.join(", ")})`);
+    document.documentElement.style.setProperty("--timeline-panel-color", `rgba(${timelinePanel.join(", ")}, ${(0.54 + easedBackgroundProgress * 0.34).toFixed(3)})`);
+    document.documentElement.style.setProperty("--timeline-border-color", `rgba(${timelineBorder.join(", ")}, ${(0.13 + easedBackgroundProgress * 0.09).toFixed(3)})`);
+    document.documentElement.style.setProperty("--timeline-line-color", `rgba(${timelineBorder.join(", ")}, ${(0.15 + easedBackgroundProgress * 0.05).toFixed(3)})`);
+    document.documentElement.style.setProperty("--timeline-shadow-color", `rgba(${timelineShadow.join(", ")}, ${(0.11 + easedBackgroundProgress * 0.17).toFixed(3)})`);
+  }
+
+  let photoProgress = 0;
+  let rawSignatureProgress = 0;
+  if (sectionRect.top < viewportHeight) {
+    const photoTop = sectionRect.top + signaturePaper.offsetTop;
+    const photoBottom = photoTop + signaturePaper.offsetHeight;
+    photoProgress = Math.min(1, Math.max(0, (viewportHeight * 0.97 - photoTop) / (viewportHeight * 0.24)));
+    const availableSignatureTravel = Math.max(
+      1,
+      viewportHeight - 24 - signaturePaper.offsetTop - signaturePaper.offsetHeight
+    );
+    const signatureTravel = Math.max(
+      1,
+      Math.min(viewportHeight * 0.22, availableSignatureTravel)
+    );
+    rawSignatureProgress = Math.min(1, Math.max(0, (viewportHeight - 24 - photoBottom) / signatureTravel));
+  }
   const signatureProgress = reducedMotionQuery.matches
     ? (rawSignatureProgress > 0 ? 1 : 0)
     : rawSignatureProgress;
 
-  signaturePaper.style.opacity = photoProgress.toFixed(3);
-  signaturePaper.style.transform = `translate3d(0, ${((1 - photoProgress) * 26).toFixed(2)}px, 0) rotate(${(-1 - photoProgress * 2.2).toFixed(2)}deg) scale(${(0.95 + photoProgress * 0.05).toFixed(4)})`;
+  if (Math.abs(photoProgress - signatureLastPhotoProgress) >= 0.0005) {
+    signatureLastPhotoProgress = photoProgress;
+    signaturePaper.style.opacity = photoProgress.toFixed(3);
+    signaturePaper.style.transform = `translate3d(0, ${((1 - photoProgress) * 26).toFixed(2)}px, 0) rotate(${(-1 - photoProgress * 2.2).toFixed(2)}deg) scale(${(0.95 + photoProgress * 0.05).toFixed(4)})`;
+  }
 
   if (Math.abs(signatureProgress - signatureLastProgress) < 0.001) return;
   signatureLastProgress = signatureProgress;
@@ -234,6 +228,9 @@ const highlightBlocks = document.querySelectorAll(".text-highlight");
 let currentStorySlide = null;
 let highlightResizeTimer = null;
 const jcsScrollStart = 0.018;
+let chessSeparatorLastProgress = -1;
+const chapterLastProgress = new WeakMap();
+let lastAppliedThemeState = "";
 
 const updateViewportWidth = () => {
   const nextWidth = document.documentElement.clientWidth;
@@ -272,6 +269,8 @@ const updateChessSeparatorCurve = () => {
   const progress = reducedMotionQuery.matches
     ? (rawProgress > 0 ? 1 : 0)
     : rawProgress * rawProgress * (3 - 2 * rawProgress);
+  if (Math.abs(progress - chessSeparatorLastProgress) < 0.0005) return;
+  chessSeparatorLastProgress = progress;
   const edge = 4;
   const depth = edge + progress * 32;
   const control = edge + (depth - edge) * 2;
@@ -287,6 +286,7 @@ const updateChapterTravel = () => {
   const baseTravel = viewportWidth * (isMobile ? 0.16 : 0.22);
 
   chapters.forEach((chapter) => {
+    chapterLastProgress.delete(chapter);
     const word = chapter.querySelector("b");
     const wordRect = word?.getBoundingClientRect();
     const chapterRect = chapter.getBoundingClientRect();
@@ -323,11 +323,10 @@ const updateTimelineMetrics = () => {
 };
 
 const renderTimelineProgress = (progress) => {
-  if (Math.abs(progress - timelineLastProgress) > 0.0001) {
-    timelineSection.style.setProperty("--timeline-progress", progress.toFixed(4));
-    timelineSection.style.setProperty("--timeline-shift", `${(-timelineHorizontalTravel * progress).toFixed(2)}px`);
-    timelineLastProgress = progress;
-  }
+  if (Math.abs(progress - timelineLastProgress) <= 0.0001) return;
+  timelineSection.style.setProperty("--timeline-progress", progress.toFixed(4));
+  timelineSection.style.setProperty("--timeline-shift", `${(-timelineHorizontalTravel * progress).toFixed(2)}px`);
+  timelineLastProgress = progress;
 
   const timelinePosition = progress * Math.max(0, timelineYears.length - 1);
   timelineYears.forEach((year, index) => {
@@ -377,6 +376,7 @@ const updateVolunteerStoryMetrics = () => {
 
   volunteerStoryMetrics = { startShift, endShift, horizontalTravel, stageHeight };
   volunteerStory.style.height = `${Math.ceil(stageHeight + horizontalTravel)}px`;
+  volunteerLastProgress = -1;
 };
 
 const updateVolunteerStory = () => {
@@ -385,6 +385,8 @@ const updateVolunteerStory = () => {
   const travel = Math.max(1, volunteerStoryMetrics.horizontalTravel);
   const rawProgress = -rect.top / travel;
   const progress = Math.min(1, Math.max(0, rawProgress));
+  if (Math.abs(progress - volunteerLastProgress) <= 0.0001) return;
+  volunteerLastProgress = progress;
   const shift = volunteerStoryMetrics.startShift
     + (volunteerStoryMetrics.endShift - volunteerStoryMetrics.startShift) * progress;
   volunteerTrack.style.transform = `translate3d(${shift.toFixed(2)}px, 0, 0)`;
@@ -801,6 +803,8 @@ const updateChapterProgress = () => {
     const maxShift = chapterTravel.get(chapter) || window.innerWidth * 0.22;
     const rect = chapter.getBoundingClientRect();
     const progress = smoothstep(window.innerHeight, -rect.height, rect.top);
+    if (Math.abs(progress - (chapterLastProgress.get(chapter) ?? -1)) <= 0.0001) return;
+    chapterLastProgress.set(chapter, progress);
 
     const shift = -maxShift + progress * maxShift * 2;
     const mobileBaton = window.innerWidth < 700;
@@ -832,6 +836,10 @@ const updateTheme = () => {
   let finalness = isFinal ? 1 : 0;
   if (window.scrollY < window.innerHeight * 0.9) darkness = 0;
   if (window.scrollY < window.innerHeight * 0.9) finalness = 0;
+
+  const themeState = `${darkness}:${finalness}`;
+  if (themeState === lastAppliedThemeState) return;
+  lastAppliedThemeState = themeState;
 
   document.documentElement.style.setProperty("--darkness", darkness.toFixed(3));
   document.documentElement.style.setProperty("--finalness", finalness.toFixed(3));
@@ -1497,6 +1505,7 @@ document.fonts?.ready.then(() => {
   scrollTriggerRuntime?.refresh();
 });
 updateScroll();
+requestAnimationFrame(() => document.documentElement.classList.remove("is-booting"));
 
 const initializeScrollEntrances = () => {
   if (!gsapRuntime || !scrollTriggerRuntime) return;
@@ -1699,7 +1708,29 @@ const initializeScrollEntrances = () => {
   scrollTriggerRuntime.refresh();
 };
 
-initializeScrollEntrances();
+let scrollEntrancesInitialized = false;
+const initializeScrollEntrancesAfterReset = () => {
+  if (scrollEntrancesInitialized) return;
+  returnToFirstSection();
+
+  const finishInitialization = () => {
+    if (scrollEntrancesInitialized) return;
+    returnToFirstSection();
+    scrollTriggerRuntime?.clearScrollMemory?.("manual");
+    scrollEntrancesInitialized = true;
+    initializeScrollEntrances();
+    document.documentElement.classList.add("scroll-entrances-ready");
+  };
+
+  requestAnimationFrame(() => {
+    returnToFirstSection();
+    requestAnimationFrame(finishInitialization);
+  });
+
+  window.setTimeout(finishInitialization, 160);
+};
+
+initializeScrollEntrancesAfterReset();
 
 let activeStoryWindow = null;
 const lensRadius = 112;

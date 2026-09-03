@@ -58,6 +58,25 @@ html {
   scrollbar-gutter: stable;
 }
 
+html,
+body {
+  overscroll-behavior: none;
+}
+
+html.is-booting body {
+  visibility: hidden;
+}
+
+html:not(.signature-ready) .jcs-signature path {
+  visibility: hidden !important;
+}
+
+html:not(.scroll-entrances-ready) .footer-socials a,
+html:not(.scroll-entrances-ready) .footer-email {
+  opacity: 0;
+  visibility: hidden;
+}
+
 body {
   margin: 0;
   position: relative;
@@ -406,6 +425,7 @@ img {
 
 .hero-content {
   position: relative;
+  top: -5svh;
   z-index: 2;
   padding-right: calc(var(--hero-photo-width) + var(--hero-content-gap));
   container-type: inline-size;
@@ -575,6 +595,7 @@ h1 {
 
 .hero h1 {
   max-width: 100%;
+  margin-bottom: 0;
   font-size: clamp(4.25rem, min(12vw, 24vh), 12.5rem);
   font-size: clamp(4.25rem, min(31cqi, 24vh), 12.5rem);
 }
@@ -678,7 +699,7 @@ h1 .hero-name-last {
 }
 
 .hero h1 {
-  margin-bottom: clamp(56px, 7vw, 88px);
+  margin-bottom: 0;
 }
 
 .hero-copy {
@@ -2523,6 +2544,7 @@ body.theme-dark .education-mark {
   isolation: isolate;
   overflow-x: hidden;
   overflow-x: clip;
+  overflow-y: clip;
 }
 
 .signature-section::before {
@@ -3014,9 +3036,9 @@ body.theme-dark .education-mark {
     --hero-photo-width: min(74vw, 340px, 32svh);
     --hero-square-width: min(86vw, 390px, 38svh);
     min-height: 100svh;
-    justify-content: flex-start;
+    justify-content: center;
     gap: 0;
-    padding: clamp(64px, 9svh, 86px) 18px 20px;
+    padding: 32px 18px;
   }
 
   .hero-stage::before {
@@ -3029,7 +3051,7 @@ body.theme-dark .education-mark {
     top: auto;
     order: 2;
     flex: 0 0 auto;
-    align-self: flex-end;
+    align-self: center;
     width: var(--hero-photo-width);
     margin-top: clamp(24px, 4svh, 38px);
     overflow: visible;
@@ -3093,7 +3115,9 @@ body.theme-dark .education-mark {
 
   .hero-content {
     order: 1;
+    top: 0;
     width: 100%;
+    text-align: center;
     margin-bottom: 0;
     padding-right: 0;
   }
@@ -3104,7 +3128,7 @@ body.theme-dark .education-mark {
 
   .hero h1 {
     font-size: clamp(3.5rem, 17vw, 5.3rem);
-    margin-bottom: 18px;
+    margin-bottom: 0;
   }
 
   .hero-copy {
