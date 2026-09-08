@@ -71,18 +71,18 @@ export default function Home() {
         </div>
       </section>
       <section className="about paper" id="about">
-        <div className="about-layout"><h2 className="reveal">A little<br/><i>about me</i></h2><div className="about-copy reveal"><p>I’m Jiacai, a Secondary 5 student at Collège Sainte-Anne de Lachine in Montreal.</p><p>I work on science and coding projects, play competitive chess, and volunteer locally.</p></div></div>
+        <div className="about-layout"><h2 className="reveal">A little <i>about me</i></h2><div className="about-copy reveal"><p>I’m Jiacai, a Secondary 5 student at Collège Sainte-Anne de Lachine in Montreal.</p><p>I work on science and coding projects, play competitive chess, and volunteer locally.</p></div></div>
         <div className="interests" data-travel aria-label="Interests"><div><span>Technology</span><span>Science</span><span>Chess</span><span>Community</span></div></div>
       </section>
       <section className="work work-cinema" id="work">
-        <div className="work-heading"><h2 className="reveal">Projects<br/><i>& activities</i></h2></div>
+        <div className="work-heading"><h2 className="reveal">Projects <i>& activities</i></h2></div>
         <div className="work-list">{projects.map((project, index) => <article className={'project-scroll project-scroll-' + index} data-scroll data-travel key={project.name}><div className="project-scene">
           <figure className="work-visual"><div className="photo-mat"><img src={'/assets/'+project.image} alt={project.name === 'LookLens' ? 'MariHacks IX winning team' : project.name} loading="lazy"/></div></figure>
           <div className="work-copy reveal"><h3>{project.name}</h3><p>{project.copy}</p><p className="secondary">{project.more}</p>{project.link && <a className="project-link" href={project.link} target="_blank" rel="noreferrer">View LookLens <ArrowUpRight size={20}/></a>}</div>
         </div></article>)}</div>
       </section>
       <section className="chess-section" id="chess" data-travel>
-        <div className="chess-heading"><h2 className="reveal">Chess<br/><i>results</i></h2><p className="reveal">Chess competitions<br/>& major tournaments.</p></div>
+        <div className="chess-heading"><h2 className="reveal">Chess <i>results</i></h2><p className="reveal">Chess competitions & major tournaments</p></div>
         <div className="chess-gallery" data-travel>
           <figure className="chess-memory"><img src="/assets/chess-rapid-2024-3rd.jpg" alt="2024 Québec youth rapid chess podium" loading="lazy"/><figcaption><strong>3rd place</strong><span>Québec youth rapid · 2024</span></figcaption></figure>
           <figure className="chess-memory chess-memory-main"><img src="/assets/chess-rapid-2025-1st.jpg" alt="Full podium at the 2025 Québec youth rapid chess championship" loading="lazy"/><figcaption><strong>1st place</strong><span>Québec youth rapid · 2025</span></figcaption></figure>
@@ -94,11 +94,11 @@ export default function Home() {
         </figure></div>)}</div>
       </section>
       <section className="community community-connected" id="community" data-travel>
-        <div className="community-heading"><h2 className="reveal">Volunteering</h2><p className="reveal">At the MUHC and<br/>the Demi-marathon Lachine.</p></div>
+        <div className="community-heading"><h2 className="reveal">Volunteering</h2><p className="reveal">At the MUHC and the Demi-marathon Lachine.</p></div>
         <div className="community-stories">
           <svg className="community-thread" viewBox="0 0 1000 800" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M250 0 C50 150 50 330 400 340 S950 570 730 800"/></svg>
-          <article className="community-story" data-travel><div className="community-logo" data-travel><img src="/assets/muhc.png" alt="McGill University Health Centre" loading="lazy"/></div><div className="community-copy reveal"><h3>McGill University<br/>Health Centre</h3><p>I volunteer at the MUHC, helping out in a hospital setting.</p></div></article>
-          <article className="community-story" data-travel><div className="community-logo" data-travel><img src="/assets/lachine.png" alt="Demi-marathon Lachine" loading="lazy"/></div><div className="community-copy reveal"><h3>Demi-marathon<br/>Lachine</h3><p>I helped on site as a volunteer at the Demi-marathon Lachine.</p></div></article>
+          <article className="community-story" data-travel><div className="community-logo" data-travel><img src="/assets/muhc.png" alt="McGill University Health Centre" loading="lazy"/></div><div className="community-copy reveal"><h3>McGill University Health Centre</h3><p>I volunteer at the MUHC, helping out in a hospital setting.</p></div></article>
+          <article className="community-story" data-travel><div className="community-logo" data-travel><img src="/assets/lachine.png" alt="Demi-marathon Lachine" loading="lazy"/></div><div className="community-copy reveal"><h3>Demi-marathon Lachine</h3><p>I helped on site as a volunteer at the Demi-marathon Lachine.</p></div></article>
         </div>
       </section>
       <footer id="contact" data-travel><a className="hello" href="mailto:jiacai.song.qc@gmail.com">Contact<ArrowUpRight/></a><div className="footer-bottom"><a href="mailto:jiacai.song.qc@gmail.com">jiacai.song.qc@gmail.com</a><div><a href="https://github.com/skibidiJCS" target="_blank" rel="noreferrer">GitHub ↗</a><a href="https://www.linkedin.com/in/jiacai-song-96612a39b/" target="_blank" rel="noreferrer">LinkedIn ↗</a></div><span>JIACAI SONG © 2026</span></div><div className="footer-checks" aria-hidden="true"/></footer>

@@ -1,3 +1,9 @@
+.about-copy, .work-copy, .community-copy { min-width: 0; }
+.about-copy p, .work-copy p, .community-copy p { max-width: 60ch; }
+.chess-heading { flex-wrap: wrap; gap: 24px 48px; }
+.chess-heading h2 { flex: 0 1 auto; }
+.chess-heading p { max-width: none; }
+.community-heading p { max-width: 60ch; }
 .work-minimal { padding-top: 90px; }
 .work-minimal .work-list { display: grid; grid-template-columns: 1fr 1fr; gap: 85px 6vw; }
 .work-minimal .work-story,
