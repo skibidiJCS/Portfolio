@@ -1,0 +1,83 @@
+.work-minimal { padding-top: 90px; }
+.work-minimal .work-list { display: grid; grid-template-columns: 1fr 1fr; gap: 85px 6vw; }
+.work-minimal .work-story,
+.work-minimal .work-story:nth-child(even) { display: flex; flex-direction: column; gap: 25px; align-items: stretch; }
+.work-minimal .work-story:nth-child(even) { padding-top: 90px; }
+.work-minimal .work-visual,
+.work-minimal .work-story:nth-child(even) .work-visual { order: 0; padding: 0; background: transparent; border-radius: 0; transform: none; }
+.work-minimal .photo-mat,
+.work-minimal .work-story:nth-child(even) .photo-mat { padding: 0; box-shadow: none; background: #e9e9df; transform: none; }
+.work-minimal .photo-mat img { width: 100%; height: auto; aspect-ratio: 4 / 3; max-height: none; object-fit: contain; }
+.work-minimal .work-copy { padding: 0; }
+.work-minimal .work-copy h3 { font-size: clamp(1.9rem, 3vw, 3rem); margin-bottom: 16px; translate: none; }
+.work-minimal .work-copy p { max-width: 460px; font-size: 17px; }
+.work-minimal .work-copy .secondary { font-size: 16px; }
+.work-minimal .category { margin-bottom: 12px; }
+.achievement-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 20px; padding: 10px 0 25px; }
+.achievement { grid-column: span 2; padding: 28px; background: #f7f6ef; position: relative; display: flex; flex-direction: column; align-items: flex-start; min-height: 295px; }
+.achievement:nth-child(2), .achievement:nth-child(5) { background: #cbd5c1; }
+.achievement:nth-child(3) { background: #e5dac4; }
+.achievement:nth-child(4), .achievement:nth-child(5) { grid-column: span 3; }
+.achievement.tournament { grid-column: span 3; background: transparent; border: 1px solid #82917440; min-height: 245px; }
+.achievement-year { font: 13px 'Courier New', monospace; color: #5b6652; }
+.achievement-place { font: italic clamp(3rem, 5.5vw, 5.5rem)/1 Georgia, serif; letter-spacing: -.055em; margin: 25px 0; color: #3c5138; }
+.achievement-place span { font: 14px Arial, sans-serif; letter-spacing: 0; margin-left: 12px; }
+.achievement h3 { font-size: 17px; font-weight: 400; line-height: 1.45; max-width: 350px; margin-bottom: 20px; }
+.achievement a { display: inline-flex; align-items: center; gap: 15px; font-size: 13px; margin-top: auto; padding: 8px 0; }
+.achievement a svg { transition: transform .3s; }
+.achievement a:hover svg { transform: translate(4px, -4px); }
+.participation { color: #5b6652; font-size: 14px; }
+.community-connected { background: #efe9dc; }
+.community-connected .community-heading { margin-bottom: 35px; }
+.community-connected .community-stories { position: relative; display: flex; flex-direction: column; gap: 50px; }
+.community-thread { position: absolute; width: 100%; height: 100%; inset: 0; pointer-events: none; fill: none; color: #b69c77; stroke: currentColor; stroke-width: 1.5; }
+.community-thread path { stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--travel, .5)); }
+.community-connected .community-story,
+.community-connected .community-story:nth-child(2) { position: relative; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 7vw; padding: 40px 0; background: transparent; box-shadow: none; margin: 0; transform: none; }
+.community-connected .community-story:nth-child(2) .community-logo { order: 2; }
+.community-connected .community-story:nth-child(2) .community-copy { padding-left: 6vw; }
+.community-connected .community-logo { position: relative; width: 100%; height: auto; aspect-ratio: 1; max-width: 370px; justify-self: center; margin: 0; border-radius: 50%; background: #e0e4d5; }
+.community-connected .community-story:nth-child(2) .community-logo { background: #e6d7bf; }
+.community-connected .community-logo img { width: 68%; height: 60%; position: relative; z-index: 1; }
+.logo-orbit { position: absolute; inset: -15px; border: 1px solid #75826680; border-radius: 50%; transform: rotate(calc(var(--travel, .5)*220deg)); }
+.logo-orbit::after { content: ''; position: absolute; width: 13px; height: 13px; border-radius: 50%; background: #758266; left: calc(50% - 6px); top: -6px; }
+.community-connected .community-story:nth-child(2) .logo-orbit { border-color: #ae825e70; }
+.community-connected .community-story:nth-child(2) .logo-orbit::after { background: #ae825e; }
+.community-connected .community-copy { background: #efe9dc; position: relative; padding: 20px 0; }
+.community-connected .community-copy p { color: #62695b; }
+@media (prefers-reduced-motion: no-preference) {
+  .work-minimal .work-visual,
+  .work-minimal .work-story:nth-child(even) .work-visual { clip-path: inset(calc((1 - var(--entrance, 1))*22%) 0 0); transform: translateY(calc(70px - var(--entrance, 1)*70px)); }
+  .work-minimal .photo-mat img { scale: calc(.9 + var(--entrance, 1)*.1); }
+  .achievement { opacity: calc(.25 + var(--entrance, 1)*.75); transform: translateY(calc(70px - var(--entrance, 1)*70px)); }
+  .achievement:nth-child(3n + 2) { transform: translateY(calc(100px - var(--entrance, 1)*100px)); }
+  .achievement-place { transform: translateY(calc(20px - var(--entrance, 1)*20px)); }
+  .community-connected .community-logo { transform: scale(calc(.8 + var(--entrance, 1)*.2)); }
+}
+@media (max-width: 800px) {
+  .achievement { padding: 22px; }
+  .community-connected .community-logo { max-width: 290px; }
+}
+@media (max-width: 550px) {
+  .work-minimal { padding-top: 60px; }
+  .work-minimal .work-list { grid-template-columns: 1fr; gap: 55px; }
+  .work-minimal .work-story:nth-child(even) { padding-top: 0; }
+  .work-minimal .work-story { gap: 20px; }
+  .achievement-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .achievement, .achievement:nth-child(4), .achievement:nth-child(5), .achievement.tournament { grid-column: span 1; padding: 18px; min-height: 275px; }
+  .achievement:first-child { grid-column: 1 / -1; min-height: 250px; }
+  .achievement-place { font-size: 44px; margin: 20px 0; }
+  .achievement h3 { font-size: 15px; }
+  .achievement.tournament .achievement-place { font-size: 30px; }
+  .achievement-place span { display: block; margin: 8px 0 0; }
+  .community-connected .community-stories { gap: 40px; }
+  .community-connected .community-story, .community-connected .community-story:nth-child(2) { grid-template-columns: 1fr; gap: 40px; padding: 20px 5px; }
+  .community-connected .community-story:nth-child(2) .community-logo { order: 0; }
+  .community-connected .community-story:nth-child(2) .community-copy { padding: 20px 0; }
+  .community-connected .community-logo { max-width: 245px; }
+  .community-thread { opacity: .5; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .community-thread path { stroke-dashoffset: 0; }
+  .logo-orbit { transform: none; }
+}
