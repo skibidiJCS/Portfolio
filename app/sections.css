@@ -102,10 +102,6 @@
 .album-print figcaption { padding: 18px 4px 8px; display: flex; flex-direction: column; gap: 8px; }
 .album-print strong { font: italic 25px/1.2 Georgia, serif; color: #465b37; }
 .album-print span { font-size: 13px; color: #6c7365; }
-.community-connected .community-stories { padding-top: 90px; gap: 125px; }
-.volunteer-stroke { position: absolute; left: 0; top: -80px; width: 100%; height: 65px; pointer-events: none; fill: none; stroke: #ad8b5f; stroke-width: 1.5; --draw: 0; }
-.volunteer-stroke path { stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--draw)); vector-effect: non-scaling-stroke; }
-.community-story:last-child .volunteer-stroke { transform: scaleX(-1); }
 @media (prefers-reduced-motion: no-preference) {
   .work-cinema .work-visual { transform: translateY(calc(60px - var(--entrance, 1)*60px)) scale(calc(1 - var(--progress)*.12)); }
   .work-cinema .photo-mat { transform: translateX(calc(var(--progress)*-40px)); }
@@ -127,15 +123,10 @@
   .work-cinema .work-copy .secondary { font-size: 14px; }
   .chess-album { grid-template-columns: 1fr; gap: 35px; padding-bottom: 25px; }
   .album-entry:last-child { padding-top: 0; width: 100%; }
-  .community-connected .community-stories { padding-top: 85px; gap: 100px; }
-  .volunteer-stroke { height: 50px; top: -65px; }
 }
 @media (max-height: 650px), (prefers-reduced-motion: reduce) {
   .project-scroll { min-height: 0; margin-bottom: 65px; }
   .project-scene { position: relative; top: auto; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .volunteer-stroke path { stroke-dashoffset: 0; }
 }
 .work-editorial .work-list { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 100px 5vw; }
 .work-editorial .work-story { grid-column: span 12; display: grid; grid-template-columns: 1.4fr 1fr; gap: 6vw; position: relative; }

@@ -26,7 +26,11 @@ export default function Home() {
     const scrollSections = Array.from(document.querySelectorAll<HTMLElement>('[data-scroll]'));
     const travels = Array.from(document.querySelectorAll<HTMLElement>('[data-travel]'));
     const reveals = Array.from(document.querySelectorAll<HTMLElement>('.reveal')); 
-    const strokes = Array.from(document.querySelectorAll<SVGSVGElement>('.volunteer-stroke'));
+    const previousRestoration = history.scrollRestoration;
+    history.scrollRestoration = 'manual';
+    const resetScroll = () => window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    resetScroll();
+    window.addEventListener('pageshow', resetScroll);
     const update = () => {
       frame = 0;
       const height = window.innerHeight;
@@ -45,11 +49,6 @@ export default function Home() {
       reveals.forEach(el => {
         if (el.getBoundingClientRect().top < height * .93) el.classList.add('visible');
       });
-      strokes.forEach(el => {
-        const top = el.getBoundingClientRect().top;
-        const draw = Math.max(0, Math.min(1, (height * .82 - top) / (height * .36)));
-        el.style.setProperty('--draw', reduced.matches ? '1' : String(draw));
-      });
       const total = document.documentElement.scrollHeight - height;
       document.documentElement.style.setProperty('--read', `${total > 0 ? window.scrollY / total * 100 : 0}%`);
     };
@@ -58,7 +57,7 @@ export default function Home() {
     window.addEventListener('resize', schedule);
     reduced.addEventListener('change', schedule);
     update();
-    return () => { cancelAnimationFrame(frame); window.removeEventListener('scroll', schedule); window.removeEventListener('resize', schedule); reduced.removeEventListener('change', schedule); };
+    return () => { cancelAnimationFrame(frame); window.removeEventListener('scroll', schedule); window.removeEventListener('resize', schedule); window.removeEventListener('pageshow', resetScroll); history.scrollRestoration = previousRestoration; reduced.removeEventListener('change', schedule); };
   }, []);
   return <>
     <a className="skip-link" href="#about">Skip introduction</a>
@@ -97,8 +96,9 @@ export default function Home() {
       <section className="community community-connected" id="community" data-travel>
         <div className="community-heading"><h2 className="reveal">Volunteering</h2><p className="reveal">At the MUHC and<br/>the Demi-marathon Lachine.</p></div>
         <div className="community-stories">
-          <article className="community-story" data-travel><svg className="volunteer-stroke" viewBox="0 0 1000 100" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M20 80 C250 10 520 10 980 65"/></svg><div className="community-logo" data-travel><img src="/assets/muhc.png" alt="McGill University Health Centre" loading="lazy"/></div><div className="community-copy reveal"><h3>McGill University<br/>Health Centre</h3><p>I volunteer at the MUHC, helping out in a hospital setting.</p></div></article>
-          <article className="community-story" data-travel><svg className="volunteer-stroke" viewBox="0 0 1000 100" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M20 80 C250 10 520 10 980 65"/></svg><div className="community-logo" data-travel><img src="/assets/lachine.png" alt="Demi-marathon Lachine" loading="lazy"/></div><div className="community-copy reveal"><h3>Demi-marathon<br/>Lachine</h3><p>I helped on site as a volunteer at the Demi-marathon Lachine.</p></div></article>
+          <svg className="community-thread" viewBox="0 0 1000 800" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M250 0 C50 150 50 330 400 340 S950 570 730 800"/></svg>
+          <article className="community-story" data-travel><div className="community-logo" data-travel><img src="/assets/muhc.png" alt="McGill University Health Centre" loading="lazy"/></div><div className="community-copy reveal"><h3>McGill University<br/>Health Centre</h3><p>I volunteer at the MUHC, helping out in a hospital setting.</p></div></article>
+          <article className="community-story" data-travel><div className="community-logo" data-travel><img src="/assets/lachine.png" alt="Demi-marathon Lachine" loading="lazy"/></div><div className="community-copy reveal"><h3>Demi-marathon<br/>Lachine</h3><p>I helped on site as a volunteer at the Demi-marathon Lachine.</p></div></article>
         </div>
       </section>
       <footer id="contact" data-travel><a className="hello" href="mailto:jiacai.song.qc@gmail.com">Contact<ArrowUpRight/></a><div className="footer-bottom"><a href="mailto:jiacai.song.qc@gmail.com">jiacai.song.qc@gmail.com</a><div><a href="https://github.com/skibidiJCS" target="_blank" rel="noreferrer">GitHub ↗</a><a href="https://www.linkedin.com/in/jiacai-song-96612a39b/" target="_blank" rel="noreferrer">LinkedIn ↗</a></div><span>JIACAI SONG © 2026</span></div><div className="footer-checks" aria-hidden="true"/></footer>
