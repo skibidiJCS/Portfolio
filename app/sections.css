@@ -84,6 +84,59 @@
 
 /* Projects */
 .work-editorial { padding-top: 90px; }
+.work-cinema .work-list { display: block; }
+.project-scroll { min-height: 125svh; position: relative; --progress: 0; }
+.project-scene { position: sticky; top: 95px; display: grid; grid-template-columns: 1.3fr 1fr; gap: 6vw; align-items: center; min-height: 70svh; }
+.project-scroll:nth-child(even) .project-scene { grid-template-columns: 1fr 1.3fr; }
+.project-scroll:nth-child(even) .work-visual { order: 2; }
+.work-cinema .work-visual { padding: 0; background: transparent; border-radius: 0; transform: none; }
+.work-cinema .photo-mat { padding: 0; background: transparent; box-shadow: none; transform: none; }
+.work-cinema .photo-mat img { max-height: 65svh; height: auto; object-fit: contain; }
+.work-cinema .work-copy { padding: 20px 0; }
+.work-cinema .work-copy h3 { translate: none; }
+.chess-album { display: grid; grid-template-columns: 1fr 1fr; align-items: start; gap: 5vw; padding: 20px 0 70px; }
+.album-entry:last-child { padding-top: 80px; width: 82%; justify-self: center; }
+.album-print { margin: 0; padding: 12px; background: #fcfaf4; box-shadow: 0 10px 25px #27322212; }
+.album-print img { width: 100%; height: auto; max-height: none; }
+.album-print a { display: block; }
+.album-print figcaption { padding: 18px 4px 8px; display: flex; flex-direction: column; gap: 8px; }
+.album-print strong { font: italic 25px/1.2 Georgia, serif; color: #465b37; }
+.album-print span { font-size: 13px; color: #6c7365; }
+.community-connected .community-stories { padding-top: 90px; gap: 125px; }
+.volunteer-stroke { position: absolute; left: 0; top: -80px; width: 100%; height: 65px; pointer-events: none; fill: none; stroke: #ad8b5f; stroke-width: 1.5; --draw: 0; }
+.volunteer-stroke path { stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--draw)); vector-effect: non-scaling-stroke; }
+.community-story:last-child .volunteer-stroke { transform: scaleX(-1); }
+@media (prefers-reduced-motion: no-preference) {
+  .work-cinema .work-visual { transform: translateY(calc(60px - var(--entrance, 1)*60px)) scale(calc(1 - var(--progress)*.12)); }
+  .work-cinema .photo-mat { transform: translateX(calc(var(--progress)*-40px)); }
+  .work-cinema .photo-mat img { clip-path: inset(0 calc((1 - var(--entrance, 1))*30%) 0 0); }
+  .project-scroll:nth-child(even) .photo-mat { transform: translateX(calc(var(--progress)*40px)); }
+  .work-cinema .work-copy { translate: 0 calc(var(--progress)*-65px); }
+  .album-print { transform: translateY(calc(90px - var(--entrance, 1)*90px)) rotate(calc(-5deg + var(--entrance, 1)*5deg)) scale(calc(.92 + var(--entrance, 1)*.08)); }
+  .album-entry:last-child .album-print { transform: translateY(calc(110px - var(--entrance, 1)*110px)) rotate(calc(5deg - var(--entrance, 1)*5deg)) scale(calc(.92 + var(--entrance, 1)*.08)); }
+}
+@media (max-width: 650px) {
+  .project-scroll { min-height: 115svh; margin-bottom: 30px; }
+  .project-scene, .project-scroll:nth-child(even) .project-scene { grid-template-columns: 1fr; gap: 24px; top: 80px; min-height: 0; }
+  .project-scroll:nth-child(even) .work-visual { order: 0; }
+  .work-cinema .photo-mat img { max-height: 42svh; }
+  .work-cinema .work-copy { padding: 0; translate: none; }
+  .work-cinema .photo-mat, .project-scroll:nth-child(even) .photo-mat { transform: none; }
+  .work-cinema .work-copy h3 { margin-bottom: 14px; font-size: 32px; }
+  .work-cinema .work-copy p { font-size: 16px; }
+  .work-cinema .work-copy .secondary { font-size: 14px; }
+  .chess-album { grid-template-columns: 1fr; gap: 35px; padding-bottom: 25px; }
+  .album-entry:last-child { padding-top: 0; width: 100%; }
+  .community-connected .community-stories { padding-top: 85px; gap: 100px; }
+  .volunteer-stroke { height: 50px; top: -65px; }
+}
+@media (max-height: 650px), (prefers-reduced-motion: reduce) {
+  .project-scroll { min-height: 0; margin-bottom: 65px; }
+  .project-scene { position: relative; top: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .volunteer-stroke path { stroke-dashoffset: 0; }
+}
 .work-editorial .work-list { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 100px 5vw; }
 .work-editorial .work-story { grid-column: span 12; display: grid; grid-template-columns: 1.4fr 1fr; gap: 6vw; position: relative; }
 .work-editorial .work-story:nth-child(2),
