@@ -81,3 +81,93 @@
   .community-thread path { stroke-dashoffset: 0; }
   .logo-orbit { transform: none; }
 }
+
+/* Projects */
+.work-editorial { padding-top: 90px; }
+.work-editorial .work-list { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 100px 5vw; }
+.work-editorial .work-story { grid-column: span 12; display: grid; grid-template-columns: 1.4fr 1fr; gap: 6vw; position: relative; }
+.work-editorial .work-story:nth-child(2),
+.work-editorial .work-story:nth-child(3) { grid-column: span 6; display: flex; flex-direction: column; align-items: stretch; gap: 30px; }
+.work-editorial .work-story:nth-child(3) { padding-top: 120px; }
+.work-editorial .work-story:nth-child(4) { grid-template-columns: 1fr 1.4fr; }
+.work-editorial .work-story:nth-child(2) .work-visual { order: 0; }
+.work-editorial .work-visual,
+.work-editorial .work-story:nth-child(even) .work-visual { background: transparent; padding: 18px; transform: none; position: relative; }
+.work-editorial .work-visual::before { content: ''; position: absolute; inset: 0; background: #e0e4d5; border-radius: 45% 45% 3px 3px; transform: rotate(-4deg); }
+.work-editorial .work-story:nth-child(2) .work-visual::before { background: #e8ddce; border-radius: 3px 40% 3px 3px; transform: rotate(3deg); }
+.work-editorial .work-story:nth-child(3) .work-visual::before { background: #e1dfc9; border-radius: 40% 3px 3px 3px; }
+.work-editorial .work-story:nth-child(4) .work-visual::before { background: #d6e0d8; border-radius: 3px 3px 45% 45%; transform: rotate(4deg); }
+.work-editorial .photo-mat,
+.work-editorial .work-story:nth-child(even) .photo-mat { padding: 0; box-shadow: none; background: transparent; transform: none; position: relative; }
+.work-editorial .photo-mat img { height: auto; width: 100%; max-height: 510px; object-fit: contain; }
+.work-editorial .work-copy { padding: 0; }
+.work-editorial .work-copy h3 { margin-bottom: 20px; font-size: clamp(2rem, 3.4vw, 3.6rem); translate: none; }
+.work-editorial .work-copy p { max-width: 420px; }
+
+/* Chess record */
+.chess-record { margin-top: 40px; }
+.chess-year { display: grid; grid-template-columns: .65fr 2fr; gap: 5vw; padding: 45px 0 70px; }
+.year-heading { font: italic clamp(3.5rem, 6.5vw, 6.5rem)/1 Georgia, serif; letter-spacing: -.06em; color: #728268; margin: 0; align-self: start; position: sticky; top: 105px; }
+.year-results { display: flex; flex-direction: column; gap: 55px; }
+.chess-finish { display: grid; grid-template-columns: 135px 1fr; align-items: center; gap: 35px; }
+.chess-finish:nth-child(2) { margin-left: 50px; }
+.finish-rank { display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; min-height: 130px; font-size: 13px; color: #46573e; }
+.finish-rank::before { content: ''; position: absolute; inset: 0; border-radius: 48% 52% 45% 55%; background: #cad4c0; z-index: 0; transform: rotate(-15deg); }
+.finish-rank { isolation: isolate; }
+.finish-rank::before { z-index: -1; }
+.chess-finish:nth-child(2) .finish-rank::before { background: #e0d7c1; }
+.chess-finish:nth-child(3) .finish-rank::before { background: #d8dfcd; }
+.finish-rank span { font: italic 45px/1.15 Georgia, serif; letter-spacing: -.055em; }
+.finish-copy h4 { margin: 0; font-size: clamp(1.05rem, 1.7vw, 1.5rem); font-weight: 400; line-height: 1.4; max-width: 460px; }
+.finish-copy a { display: inline-flex; align-items: center; gap: 14px; font-size: 13px; padding: 12px 0; margin-top: 5px; }
+.finish-copy a:hover svg { transform: translate(3px, -3px); }
+.finish-copy a svg { transition: transform .25s; }
+.tournament-notes { display: grid; grid-template-columns: 1fr 1fr; gap: 5vw; padding-top: 50px; }
+.tournament-note:last-child { padding-top: 85px; }
+.tournament-photo { display: block; padding: 10px; background: #f4f1e7; transform: rotate(-3deg); margin-bottom: 30px; }
+.tournament-note:last-child .tournament-photo { transform: rotate(3deg); }
+.tournament-photo img { height: auto; max-height: 320px; object-fit: contain; }
+.tournament-note h3 { font-size: 21px; line-height: 1.4; font-weight: 400; margin: 12px 0; }
+.tournament-note p, .tournament-note span { font-size: 14px; color: #626f58; }
+.community-connected .community-heading h2 { font-size: clamp(3.2rem, 7.4vw, 7.5rem); overflow-wrap: anywhere; }
+@media (prefers-reduced-motion: no-preference) {
+  .work-editorial .work-visual,
+  .work-editorial .work-story:nth-child(even) .work-visual { transform: translateY(calc(65px - var(--entrance, 1)*65px)); }
+  .work-editorial .work-visual::before { scale: calc(.82 + var(--entrance, 1)*.18); rotate: calc(-8deg + var(--travel, .5)*16deg); }
+  .work-editorial .photo-mat,
+  .work-editorial .work-story:nth-child(even) .photo-mat { transform: translateY(calc(30px - var(--travel, .5)*60px)); }
+  .work-editorial .photo-mat img { clip-path: inset(calc((1 - var(--entrance, 1))*18%) 0 0); }
+  .chess-finish { transform: translateX(calc(40px - var(--entrance, 1)*40px)); }
+  .finish-rank::before { rotate: calc(var(--travel, .5)*45deg); scale: calc(.75 + var(--entrance, 1)*.25); }
+  .finish-rank span { translate: 0 calc(15px - var(--entrance, 1)*15px); }
+  .tournament-photo { translate: 0 calc(50px - var(--entrance, 1)*50px); rotate: calc(4deg - var(--travel, .5)*8deg); }
+}
+@media (max-width: 800px) {
+  .chess-year { grid-template-columns: .5fr 2fr; gap: 25px; }
+  .chess-finish { grid-template-columns: 100px 1fr; gap: 25px; }
+  .finish-rank { min-height: 100px; }
+  .chess-finish:nth-child(2) { margin-left: 15px; }
+  .finish-rank span { font-size: 38px; }
+}
+@media (max-width: 550px) {
+  .work-editorial { padding-top: 60px; }
+  .work-editorial .work-list { display: flex; flex-direction: column; gap: 60px; }
+  .work-editorial .work-story,
+  .work-editorial .work-story:nth-child(2),
+  .work-editorial .work-story:nth-child(3),
+  .work-editorial .work-story:nth-child(4) { display: flex; flex-direction: column; padding-top: 0; gap: 25px; align-items: stretch; }
+  .work-editorial .work-story:nth-child(even) .work-visual { order: 0; }
+  .work-editorial .work-visual { padding: 14px; }
+  .chess-year { grid-template-columns: 1fr; gap: 30px; padding: 25px 0 45px; }
+  .year-heading { position: static; font-size: 55px; }
+  .year-results { gap: 30px; }
+  .chess-finish { grid-template-columns: 85px 1fr; gap: 20px; }
+  .chess-finish:nth-child(2) { margin-left: 0; }
+  .finish-rank { min-height: 90px; }
+  .finish-rank span { font-size: 34px; }
+  .finish-copy h4 { font-size: 17px; }
+  .tournament-notes { grid-template-columns: 1fr; gap: 40px; padding-top: 20px; }
+  .tournament-note:last-child { padding-top: 0; }
+  .tournament-photo { margin-bottom: 22px; }
+  .community-connected .community-heading h2 { font-size: clamp(2.5rem, 10.8vw, 3.7rem); }
+}
