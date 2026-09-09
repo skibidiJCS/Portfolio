@@ -15,7 +15,7 @@ const results = [
 const projects = [
   { name: 'LookLens', category: 'Hackathon', image: 'marihacks-ix-gemma.jpg', copy: 'Our team won Best Use of Google Gemma at MariHacks IX.', more: 'We built LookLens during a hackathon for high school and CEGEP students.', link: 'https://devpost.com/software/looklens' },
   { name: 'Expo-sciences', category: 'Science · 2025–2026', image: 'expo-sciences.jpg', copy: 'My science project for the SciMaTic program.', more: 'The work includes designing a prototype, testing it, and presenting the results.' },
-  { name: 'Mathematics', category: 'Problem solving', image: 'optimath-finalist.jpg', copy: 'AQJM finalist, 2023–2025. Optimath finalist, 2025.', more: 'Awarded a certificate of distinction at Optimath.' },
+  { name: 'Mathematics', category: 'Problem solving', image: 'optimath-finalist.jpg', copy: 'AQJM finalist, 2023–2025. Optimath finalist, 2025.', more: '' },
 ];
 
 export default function Home() {
@@ -77,7 +77,7 @@ export default function Home() {
         <div className="work-heading"><h2 className="reveal">Projects <i>& activities</i></h2></div>
         <div className="work-list">{projects.map((project, index) => <article className={'project-scroll project-scroll-' + index} data-scroll data-travel key={project.name}><div className="project-scene">
           <figure className="work-visual"><div className="photo-mat"><img src={'/assets/'+project.image} alt={project.name === 'LookLens' ? 'MariHacks IX winning team' : project.name} loading="lazy"/></div></figure>
-          <div className="work-copy reveal"><h3>{project.name}</h3><p>{project.copy}</p><p className="secondary">{project.more}</p>{project.link && <a className="project-link" href={project.link} target="_blank" rel="noreferrer">View LookLens <ArrowUpRight size={20}/></a>}</div>
+          <div className="work-copy reveal"><h3>{project.name}</h3><p>{project.copy}</p>{project.more && <p className="secondary">{project.more}</p>}{project.link && <a className="project-link" href={project.link} target="_blank" rel="noreferrer">View LookLens <ArrowUpRight size={20}/></a>}</div>
         </div></article>)}</div>
       </section>
       <section className="chess-section" id="chess" data-travel>
@@ -100,7 +100,7 @@ export default function Home() {
           <article className="community-story" data-travel><div className="community-logo" data-travel><img src="/assets/lachine.png" alt="Demi-marathon Lachine" loading="lazy"/></div><div className="community-copy reveal"><h3>Demi-marathon Lachine</h3><p>I helped on site as a volunteer at the Demi-marathon Lachine.</p></div></article>
         </div>
       </section>
-      <footer id="contact" data-travel><a className="hello" href="mailto:jiacai.song.qc@gmail.com">Contact<ArrowUpRight/></a><div className="footer-bottom"><a href="mailto:jiacai.song.qc@gmail.com">jiacai.song.qc@gmail.com</a><div><a href="https://github.com/skibidiJCS" target="_blank" rel="noreferrer">GitHub ↗</a><a href="https://www.linkedin.com/in/jiacai-song-96612a39b/" target="_blank" rel="noreferrer">LinkedIn ↗</a></div><span>JIACAI SONG © 2026</span></div><div className="footer-checks" aria-hidden="true"/></footer>
+      <footer id="contact" data-travel><a className="hello" href="mailto:jiacai.song.qc@gmail.com">Contact<ArrowUpRight/></a><div className="footer-bottom"><a href="mailto:jiacai.song.qc@gmail.com">jiacai.song.qc@gmail.com</a><div><a href="https://github.com/skibidiJCS" target="_blank" rel="noreferrer">GitHub ↗</a><a href="https://www.linkedin.com/in/jiacai-song-96612a39b/" target="_blank" rel="noreferrer">LinkedIn ↗</a></div></div><div className="footer-checks" aria-hidden="true"/></footer>
     </main>
   </>;
 }
