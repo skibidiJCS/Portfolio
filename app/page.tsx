@@ -10,13 +10,12 @@ const results = [
   ['2024', 'Championnat jeunesse du Québec · Rapid', '3rd place', 'chess-rapid-2024-3rd.jpg'],
   ['2024', 'Québec vs Ontario · Team tournament', '2nd place', ''],
   ['2024–25', 'Canadian Youth Chess Championship', 'Participant', 'cycc-2025.jpg'],
-  ['2025', 'North American Youth Chess Championship · Kingston', 'Participant', 'naycc-2025.jpg'],
+  ['2025', 'North American Youth Chess Championship', 'Participant', 'naycc-2025.jpg'],
 ];
 const projects = [
   { name: 'LookLens', category: 'Hackathon', image: 'marihacks-ix-gemma.jpg', copy: 'Our team won Best Use of Google Gemma at MariHacks IX.', more: 'We built LookLens during a hackathon for high school and CEGEP students.', link: 'https://devpost.com/software/looklens' },
   { name: 'Expo-sciences', category: 'Science · 2025–2026', image: 'expo-sciences.jpg', copy: 'My science project for the SciMaTic program.', more: 'The work includes designing a prototype, testing it, and presenting the results.' },
   { name: 'Mathematics', category: 'Problem solving', image: 'optimath-finalist.jpg', copy: 'AQJM finalist, 2023–2025. Optimath finalist, 2025.', more: 'Awarded a certificate of distinction at Optimath.' },
-  { name: 'Dragon boat', category: 'Sport', image: 'dragon-boat.jpg', copy: 'Our team placed 2nd and 3rd in Montreal competitions.', more: 'I competed with a team, paddling together throughout each race.' },
 ];
 
 export default function Home() {
@@ -74,7 +73,7 @@ export default function Home() {
         <div className="about-layout"><h2 className="reveal">A little <i>about me</i></h2><div className="about-copy reveal"><p>I’m Jiacai, a Secondary 5 student at Collège Sainte-Anne de Lachine in Montreal.</p><p>I work on science and coding projects, play competitive chess, and volunteer locally.</p></div></div>
         <div className="interests" data-travel aria-label="Interests"><div><span>Technology</span><span>Science</span><span>Chess</span><span>Community</span></div></div>
       </section>
-      <section className="work work-cinema" id="work">
+      <section className="work work-three" id="work">
         <div className="work-heading"><h2 className="reveal">Projects <i>& activities</i></h2></div>
         <div className="work-list">{projects.map((project, index) => <article className={'project-scroll project-scroll-' + index} data-scroll data-travel key={project.name}><div className="project-scene">
           <figure className="work-visual"><div className="photo-mat"><img src={'/assets/'+project.image} alt={project.name === 'LookLens' ? 'MariHacks IX winning team' : project.name} loading="lazy"/></div></figure>
@@ -84,13 +83,13 @@ export default function Home() {
       <section className="chess-section" id="chess" data-travel>
         <div className="chess-heading"><h2 className="reveal">Chess <i>results</i></h2><p className="reveal">Chess competitions & major tournaments</p></div>
         <div className="chess-gallery" data-travel>
-          <figure className="chess-memory"><img src="/assets/chess-rapid-2024-3rd.jpg" alt="2024 Québec youth rapid chess podium" loading="lazy"/><figcaption><strong>3rd place</strong><span>Québec youth rapid · 2024</span></figcaption></figure>
-          <figure className="chess-memory chess-memory-main"><img src="/assets/chess-rapid-2025-1st.jpg" alt="Full podium at the 2025 Québec youth rapid chess championship" loading="lazy"/><figcaption><strong>1st place</strong><span>Québec youth rapid · 2025</span></figcaption></figure>
-          <figure className="chess-memory"><img src="/assets/team-quebec-ontario-2025-1st.jpg" alt="Québec team at the 2025 Québec versus Ontario tournament" loading="lazy"/><figcaption><strong>1st place</strong><span>Québec vs Ontario · 2025</span></figcaption></figure>
+          <figure className="chess-memory"><img src="/assets/chess-rapid-2024-3rd.jpg" alt="2024 Québec youth rapid chess podium" loading="lazy"/><figcaption><div className="print-heading"><strong>3rd place</strong><span>2024</span></div><span>Québec youth rapid</span></figcaption></figure>
+          <figure className="chess-memory chess-memory-main"><img src="/assets/chess-rapid-2025-1st.jpg" alt="Full podium at the 2025 Québec youth rapid chess championship" loading="lazy"/><figcaption><div className="print-heading"><strong>1st place</strong><span>2025</span></div><span>Québec youth rapid</span></figcaption></figure>
+          <figure className="chess-memory"><img src="/assets/team-quebec-ontario-2025-1st.jpg" alt="Québec team at the 2025 Québec versus Ontario tournament" loading="lazy"/><figcaption><div className="print-heading"><strong>1st place</strong><span>2025</span></div><span>Québec vs Ontario</span></figcaption></figure>
         </div>
         <div className="chess-album">{results.filter(result => result[2] === 'Participant').map(([year,name,,photo]) => <div className="album-entry" data-travel key={name}><figure className="album-print">
           <a href={'/assets/'+photo} target="_blank" rel="noreferrer" aria-label={'View photo: '+name}><img src={'/assets/'+photo} alt={name} loading="lazy"/></a>
-          <figcaption><strong>{name.startsWith('Canadian') ? 'CYCC' : 'NAYCC'}</strong><span>{name} · {year}</span></figcaption>
+          <figcaption><div className="print-heading"><strong>{name.startsWith('Canadian') ? 'CYCC' : 'NAYCC'}</strong><span>{year}</span></div><span>{name}</span><span className="print-location">{name.startsWith('Canadian') ? 'Vancouver' : 'Kingston'}</span></figcaption>
         </figure></div>)}</div>
       </section>
       <section className="community community-connected" id="community" data-travel>

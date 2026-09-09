@@ -1,3 +1,37 @@
+.print-heading { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px 18px; }
+.print-heading > span { font-variant-numeric: tabular-nums; }
+.album-print .print-location { margin-top: 8px; color: #465b37; }
+.work-three .work-list { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px 6vw; }
+.work-three .project-scroll { min-height: 115svh; }
+.work-three .project-scroll:first-child { grid-column: 1 / -1; min-height: 120svh; }
+.work-three .project-scene { top: 95px; display: flex; flex-direction: column; align-items: stretch; min-height: 0; gap: 25px; }
+.work-three .project-scroll:first-child .project-scene { display: grid; grid-template-columns: 1.35fr 1fr; align-items: center; gap: 6vw; min-height: 65svh; }
+.work-three .project-scroll:nth-child(even) .work-visual { order: 0; }
+.work-three .work-visual { padding: 0; background: transparent; transform: none; }
+.work-three .photo-mat { padding: 0; background: transparent; transform: none; box-shadow: none; }
+.work-three .photo-mat img { height: 38svh; max-height: none; object-fit: contain; object-position: left center; }
+.work-three .project-scroll:first-child .photo-mat img { height: auto; max-height: 65svh; }
+.work-three .work-copy { padding: 0; }
+.work-three .work-copy h3 { font-size: clamp(2rem, 3vw, 3.2rem); margin-bottom: 18px; translate: none; }
+.work-three .work-copy p { font-size: 17px; }
+.work-three .work-copy .secondary { font-size: 16px; }
+@media (prefers-reduced-motion: no-preference) {
+  .work-three .work-visual { transform: translateY(calc(65px - var(--entrance, 1)*65px)) scale(calc(1 - var(--progress)*.08)); transform-origin: left center; }
+  .work-three .photo-mat img { clip-path: inset(0 calc((1 - var(--entrance, 1))*45%) 0 0); }
+  .work-three .work-copy { translate: 0 calc(var(--progress)*-25px); }
+  .work-three .project-scroll:first-child .photo-mat { transform: translateX(calc(var(--progress)*-20px)); }
+}
+@media (max-width: 650px) {
+  .work-three .work-list { grid-template-columns: 1fr; gap: 25px; }
+  .work-three .project-scroll, .work-three .project-scroll:first-child { min-height: 105svh; }
+  .work-three .project-scene, .work-three .project-scroll:first-child .project-scene { display: flex; min-height: 0; top: 80px; gap: 25px; }
+  .work-three .photo-mat img, .work-three .project-scroll:first-child .photo-mat img { height: auto; max-height: 40svh; }
+  .work-three .work-copy { translate: none; }
+}
+@media (max-height: 650px), (prefers-reduced-motion: reduce) {
+  .work-three .project-scroll, .work-three .project-scroll:first-child { min-height: 0; margin-bottom: 60px; }
+  .work-three .project-scene { position: relative; top: auto; }
+}
 .about-copy, .work-copy, .community-copy { min-width: 0; }
 .about-copy p, .work-copy p, .community-copy p { max-width: 60ch; }
 .chess-heading { flex-wrap: wrap; gap: 24px 48px; }
