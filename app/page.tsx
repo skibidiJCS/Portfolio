@@ -66,7 +66,6 @@ export default function Home() {
         <div className="opening-stage">
           <h1><span className="first-name">Jiacai</span><span className="last-name">Song</span></h1>
           <figure className="hero-portrait"><img src="/assets/hero-mountain.jpeg" alt="Jiacai in the mountains" fetchPriority="high"/></figure>
-          <div className="intro-bottom"><p>Student at Sainte-Anne<br/>Interested in science and technology</p></div>
         </div>
       </section>
       <section className="about paper" id="about">
