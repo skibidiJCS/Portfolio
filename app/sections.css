@@ -29,7 +29,7 @@
 .achievement:nth-child(4), .achievement:nth-child(5) { grid-column: span 3; }
 .achievement.tournament { grid-column: span 3; background: transparent; border: 1px solid #82917440; min-height: 245px; }
 .achievement-year { font: 13px 'Courier New', monospace; color: #5b6652; }
-.achievement-place { font: italic clamp(3rem, 5.5vw, 5.5rem)/1 Georgia, serif; letter-spacing: -.055em; margin: 25px 0; color: #3c5138; }
+.achievement-place { font: normal clamp(3rem, 5.5vw, 5.5rem)/1 Georgia, serif; letter-spacing: -.055em; margin: 25px 0; color: #3c5138; }
 .achievement-place span { font: 14px Arial, sans-serif; letter-spacing: 0; margin-left: 12px; }
 .achievement h3 { font-size: 17px; font-weight: 400; line-height: 1.45; max-width: 350px; margin-bottom: 20px; }
 .achievement a { display: inline-flex; align-items: center; gap: 15px; font-size: 13px; margin-top: auto; padding: 8px 0; }
@@ -109,7 +109,7 @@
 .album-print img { width: 100%; height: auto; max-height: none; }
 .album-print a { display: block; }
 .album-print figcaption { padding: 18px 4px 8px; display: flex; flex-direction: column; gap: 8px; }
-.album-print strong { font: italic 25px/1.2 Georgia, serif; color: #465b37; }
+.album-print strong { font: normal 25px/1.2 Georgia, serif; color: #465b37; }
 .album-print span { font-size: 13px; color: #6c7365; }
 @media (prefers-reduced-motion: no-preference) {
   .work-cinema .work-visual { transform: translateY(calc(60px - var(--entrance, 1)*60px)) scale(calc(1 - var(--progress)*.12)); }
@@ -160,7 +160,7 @@
 /* Chess record */
 .chess-record { margin-top: 40px; }
 .chess-year { display: grid; grid-template-columns: .65fr 2fr; gap: 5vw; padding: 45px 0 70px; }
-.year-heading { font: italic clamp(3.5rem, 6.5vw, 6.5rem)/1 Georgia, serif; letter-spacing: -.06em; color: #728268; margin: 0; align-self: start; position: sticky; top: 105px; }
+.year-heading { font: normal clamp(3.5rem, 6.5vw, 6.5rem)/1 Georgia, serif; letter-spacing: -.06em; color: #728268; margin: 0; align-self: start; position: sticky; top: 105px; }
 .year-results { display: flex; flex-direction: column; gap: 55px; }
 .chess-finish { display: grid; grid-template-columns: 135px 1fr; align-items: center; gap: 35px; }
 .chess-finish:nth-child(2) { margin-left: 50px; }
@@ -170,7 +170,7 @@
 .finish-rank::before { z-index: -1; }
 .chess-finish:nth-child(2) .finish-rank::before { background: #e0d7c1; }
 .chess-finish:nth-child(3) .finish-rank::before { background: #d8dfcd; }
-.finish-rank span { font: italic 45px/1.15 Georgia, serif; letter-spacing: -.055em; }
+.finish-rank span { font: normal 45px/1.15 Georgia, serif; letter-spacing: -.055em; }
 .finish-copy h4 { margin: 0; font-size: clamp(1.05rem, 1.7vw, 1.5rem); font-weight: 400; line-height: 1.4; max-width: 460px; }
 .finish-copy a { display: inline-flex; align-items: center; gap: 14px; font-size: 13px; padding: 12px 0; margin-top: 5px; }
 .finish-copy a:hover svg { transform: translate(3px, -3px); }
