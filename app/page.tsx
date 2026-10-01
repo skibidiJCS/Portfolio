@@ -13,8 +13,8 @@ const results = [
   ['2025', 'North American Youth Chess Championship', 'Participant', 'naycc-2025.jpg'],
 ];
 const projects = [
-  { name: 'LookLens', category: 'Hackathon', image: 'marihacks-ix-gemma.jpg', copy: 'Our team won Best Use of Google Gemma at MariHacks IX.', more: 'We built LookLens during a hackathon for high school and CEGEP students.', link: 'https://devpost.com/software/looklens' },
-  { name: 'respace', category: 'App development', image: 'respace-cover.png', copy: 'An app I’m building to scan rooms and plan furniture layouts.', more: 'Try different arrangements with furniture you already own, while keeping doors, windows and walkways clear.' },
+  { name: 'LookLens', category: 'Hackathon', image: 'marihacks-ix-gemma.jpg', copy: 'Our team won Best Use of Google Gemma at MariHacks IX.', more: '', link: 'https://devpost.com/software/looklens' },
+  { name: 'respace', category: 'App development', video: 'https://www.youtube.com/embed/jwq1LvUfXtk?start=27', image: 'respace-cover.png', copy: 'An app I’m building to scan rooms and plan furniture layouts.', more: '' },
   { name: 'Mathematics', category: 'Problem solving', image: 'optimath-finalist.jpg', copy: 'AQJM finalist, 2023–2025. Optimath finalist, 2025.', more: '' },
 ];
 
@@ -74,7 +74,7 @@ export default function Home() {
       <section className="work work-cinema" id="work">
         <div className="work-heading"><h2 className="reveal">Projects <i>& activities</i></h2></div>
         <div className="work-list">{projects.map((project, index) => <article className={'project-scroll project-scroll-' + index} data-scroll data-travel key={project.name}><div className="project-scene">
-          <figure className="work-visual"><div className="photo-mat"><img src={'/assets/'+project.image} alt={project.name === 'LookLens' ? 'MariHacks IX winning team' : project.name} loading="lazy"/></div></figure>
+          <figure className="work-visual"><div className="photo-mat">{project.video ? <iframe className="project-video" src={project.video} title="respace app demo" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen/> : <img src={'/assets/'+project.image} alt={project.name === 'LookLens' ? 'MariHacks IX winning team' : project.name} loading="lazy"/>}</div></figure>
           <div className="work-copy reveal"><h3>{project.name}</h3><p>{project.copy}</p>{project.more && <p className="secondary">{project.more}</p>}{project.link && <a className="project-link" href={project.link} target="_blank" rel="noreferrer">View LookLens <ArrowUpRight size={20}/></a>}</div>
         </div></article>)}</div>
       </section>
@@ -91,7 +91,7 @@ export default function Home() {
         </figure></div>)}</div>
       </section>
       <section className="community community-connected" id="community" data-travel>
-        <div className="community-heading"><h2 className="reveal">Volunteering</h2><p className="reveal">At the MUHC and the Demi-marathon Lachine.</p></div>
+        <div className="community-heading"><h2 className="reveal">Volunteering</h2><p className="reveal">at the MUHC and the Demi-marathon Lachine</p></div>
         <div className="community-stories">
           <svg className="community-thread" viewBox="0 0 1000 800" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M250 0 C50 150 50 330 400 340 S950 570 730 800"/></svg>
           <article className="community-story" data-travel><div className="community-logo" data-travel><img src="/assets/muhc.png" alt="McGill University Health Centre" loading="lazy"/></div><div className="community-copy reveal"><h3>McGill University Health Centre</h3></div></article>

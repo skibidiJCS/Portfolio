@@ -224,3 +224,5 @@
   .tournament-photo { margin-bottom: 22px; }
   .community-connected .community-heading h2 { font-size: clamp(2.5rem, 10.8vw, 3.7rem); }
 }
+
+.project-video { display: block; width: 100%; aspect-ratio: 16 / 9; height: auto; border: 0; }
