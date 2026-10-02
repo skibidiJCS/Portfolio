@@ -45,9 +45,9 @@
 .community-connected .community-story:nth-child(2) { position: relative; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 7vw; padding: 40px 0; background: transparent; box-shadow: none; margin: 0; transform: none; }
 .community-connected .community-story:nth-child(2) .community-logo { order: 2; }
 .community-connected .community-story:nth-child(2) .community-copy { padding-left: 6vw; }
-.community-connected .community-logo { position: relative; width: 100%; height: auto; aspect-ratio: 1; max-width: 370px; justify-self: center; margin: 0; border-radius: 50%; background: #e0e4d5; }
-.community-connected .community-story:nth-child(2) .community-logo { background: #e6d7bf; }
-.community-connected .community-logo img { width: 68%; height: 60%; position: relative; z-index: 1; }
+.community-connected .community-logo { position: relative; width: 100%; height: auto; aspect-ratio: 5 / 4; max-width: 370px; justify-self: center; margin: 0; border-radius: 2px; background: #f8f5ed; border: 1px solid #b8bba780; box-shadow: 8px 8px 0 #dce1d2; }
+.community-connected .community-story:nth-child(2) .community-logo { background: #f8f5ed; border-color: #bca98c80; box-shadow: 8px 8px 0 #e3d7c1; }
+.community-connected .community-logo img { width: 64%; height: 68%; position: relative; z-index: 1; }
 .logo-orbit { position: absolute; inset: -15px; border: 1px solid #75826680; border-radius: 50%; transform: rotate(calc(var(--travel, .5)*220deg)); }
 .logo-orbit::after { content: ''; position: absolute; width: 13px; height: 13px; border-radius: 50%; background: #758266; left: calc(50% - 6px); top: -6px; }
 .community-connected .community-story:nth-child(2) .logo-orbit { border-color: #ae825e70; }
