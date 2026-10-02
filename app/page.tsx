@@ -14,7 +14,7 @@ const results = [
 ];
 const projects = [
   { name: 'LookLens', category: 'Hackathon', image: 'marihacks-ix-gemma.jpg', copy: 'Our team won Best Use of Google Gemma at MariHacks IX.', more: '', link: 'https://devpost.com/software/looklens' },
-  { name: 'respace', category: 'App development', video: 'https://www.youtube.com/embed/jwq1LvUfXtk?start=27', image: 'respace-cover.png', copy: 'An app I’m building to scan rooms and plan furniture layouts.', more: '' },
+  { name: 'respace', category: 'App development', video: 'https://www.youtube.com/embed/jwq1LvUfXtk', image: 'respace-cover.png', copy: 'An app I’m building to scan rooms and plan furniture layouts.', more: '' },
   { name: 'Mathematics', category: 'Problem solving', image: 'optimath-finalist.jpg', copy: 'AQJM finalist, 2023–2025. Optimath finalist, 2025.', more: '' },
 ];
 
