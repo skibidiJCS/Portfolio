@@ -226,3 +226,33 @@
 }
 
 .project-video { display: block; width: 100%; aspect-ratio: 16 / 9; height: auto; border: 0; }
+
+html { scroll-padding-top: 24px; }
+a { transition: color .25s ease; }
+a:hover, a:focus-visible { color: #8a4b32; }
+footer a:hover, footer a:focus-visible { color: #e6bc8e; }
+.album-print a:hover, .album-print a:focus-visible { outline: 2px solid #8a4b32; outline-offset: 4px; }
+.opening { height: 240svh; --hero-progress: 0; --name-exit: 100vw; }
+.opening-stage { height: 100dvh; min-height: 0; padding: 0; }
+.opening h1 { top: 23%; transform: translateX(calc(var(--hero-progress) * -1 * var(--name-exit))); will-change: transform; }
+.first-name, .last-name { transform: none; opacity: 1; }
+.hero-portrait {
+  left: calc(62% * (1 - var(--hero-progress)));
+  top: calc(25% * (1 - var(--hero-progress)));
+  width: calc(29% + var(--hero-progress) * 71%);
+  height: calc(52% + var(--hero-progress) * 48%);
+  transform: rotate(calc(6deg * (1 - var(--hero-progress))));
+  box-shadow: none;
+  will-change: width, height, left, top, transform;
+}
+.hero-portrait img { transform: scale(calc(1.15 - var(--hero-progress) * .15)); }
+@media (max-width: 650px) {
+  .opening h1 { top: 14%; left: 7%; font-size: 25vw; }
+  .hero-portrait { left: calc(48% * (1 - var(--hero-progress))); top: calc(44% * (1 - var(--hero-progress))); width: calc(44% + var(--hero-progress) * 56%); height: calc(43% + var(--hero-progress) * 57%); }
+  .project-scene, .project-scroll:nth-child(even) .project-scene { top: 24px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .opening { height: 100dvh; }
+  .opening h1 { transform: none; }
+  .hero-portrait, .hero-portrait img { transform: none; }
+}

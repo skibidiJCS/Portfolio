@@ -37,6 +37,13 @@ export default function Home() {
         const rect = el.getBoundingClientRect();
         const progress = Math.max(0, Math.min(1, -rect.top / Math.max(1, rect.height - height)));
         el.style.setProperty('--progress', reduced.matches ? '0' : String(progress));
+        if (el.classList.contains('opening')) {
+          const stage = el.querySelector<HTMLElement>('.opening-stage');
+          const name = el.querySelector<HTMLElement>('h1');
+          const heroProgress = Math.max(0, Math.min(1, -rect.top / Math.max(1, (rect.height - (stage?.offsetHeight ?? height)) * .8)));
+          el.style.setProperty('--hero-progress', reduced.matches ? '0' : String(heroProgress));
+          if (name) el.style.setProperty('--name-exit', `${name.offsetLeft + name.offsetWidth + 32}px`);
+        }
       });
       travels.forEach(el => {
         const rect = el.getBoundingClientRect();
@@ -60,7 +67,6 @@ export default function Home() {
   }, []);
   return <>
     <a className="skip-link" href="#about">Skip introduction</a>
-    <header><a className="brand" href="#top">JCS</a><nav aria-label="Main navigation"><a href="#work">Work</a><a href="#community">Community</a></nav><a className="header-contact" href="#contact">Contact <ArrowUpRight size={16}/></a></header>
     <main>
       <section id="top" className="opening" data-scroll>
         <div className="opening-stage">
